@@ -9,7 +9,12 @@ func main() {
 	chain.AddBlock("Send 1 BTC to Ivan")
 	chain.AddBlock("Send 2 more BTC to Ivan")
 
-	for _, block := range chain.Blocks {
-		block.Print()
+	iter := chain.Iterator()
+	for {
+		if len(iter.CurHash) == 0 {
+			break
+		}
+		curBlock := iter.Next()
+		curBlock.Print()
 	}
 }
