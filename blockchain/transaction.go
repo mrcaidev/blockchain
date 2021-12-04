@@ -120,9 +120,9 @@ func (tx *Transaction) Print() {
 	fmt.Printf("  ID: %x\n", tx.ID)
 	for index, txi := range tx.Inputs {
 		fmt.Printf("  Input %d:\n", index)
-		fmt.Printf("    RefID:     %x\n", txi.RefID)
-		fmt.Printf("    OutIndex:  %d\n", txi.OutIndex)
-		fmt.Printf("    ScriptSig: %s\n", txi.ScriptSig)
+		fmt.Printf("    RefID:        %x\n", txi.RefID)
+		fmt.Printf("    OutIndex:     %d\n", txi.OutIndex)
+		fmt.Printf("    ScriptSig:    %s\n", txi.ScriptSig)
 	}
 	for index, txo := range tx.Outputs {
 		fmt.Printf("  Output %d:\n", index)

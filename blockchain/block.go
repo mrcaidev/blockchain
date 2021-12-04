@@ -31,6 +31,7 @@ func NewBlock(transactions []*Transaction, prevBlockHash []byte) *Block {
 		Nonce:         0,
 	}
 	// 证明工作量。
+	fmt.Println("Mining block of this transaction...")
 	pow := CreatePow(block)
 	pow.Run()
 
@@ -65,7 +66,7 @@ func DeserializeBlock(seq []byte) *Block {
 }
 
 // 将区块追加进数据库。
-func (block *Block) AddToBucket(bucket *bolt.Bucket) {
+func (block *Block) StoreInBucket(bucket *bolt.Bucket) {
 	// 添加区块。
 	err := bucket.Put(block.Hash, block.Serialize())
 	if err != nil {
@@ -80,12 +81,12 @@ func (block *Block) AddToBucket(bucket *bolt.Bucket) {
 
 // 计算区块内交易的哈希值。
 func (block *Block) TransactionHash() []byte {
-	var hashes [][]byte
+	var IDs [][]byte
 
 	for _, tx := range block.Transactions {
-		hashes = append(hashes, tx.ID)
+		IDs = append(IDs, tx.ID)
 	}
-	generalHash := sha256.Sum256(bytes.Join(hashes, []byte{}))
+	generalHash := sha256.Sum256(bytes.Join(IDs, []byte{}))
 
 	return generalHash[:]
 }
@@ -96,6 +97,7 @@ func (block *Block) Print() {
 	fmt.Printf("Hash:      %x\n", block.Hash)
 	fmt.Printf("Nonce:     %d\n", block.Nonce)
 	fmt.Printf("Prev hash: %x\n", block.PrevBlockHash)
+	fmt.Println()
 	for index, tx := range block.Transactions {
 		fmt.Printf("Transaction %d:\n", index)
 		tx.Print()

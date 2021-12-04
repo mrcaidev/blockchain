@@ -31,7 +31,7 @@ func (cli *CLI) send(from string, to string, amount int) {
 	defer chain.CloseDatabase()
 	tx := blockchain.NewUTXOTransaction(from, to, amount, chain)
 	chain.AddBlock([]*blockchain.Transaction{tx})
-	fmt.Println("Send success!")
+	fmt.Println("Success!")
 }
 
 // 打印区块链。

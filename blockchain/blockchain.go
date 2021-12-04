@@ -13,7 +13,7 @@ import (
 const dbFile = "blockchain.db"
 const blocksBucket = "blocks"
 
-const genesisCoinbase = "Lorem ipsum"
+const genesisCoinbase = "Genesis Coinbase"
 
 // 区块链结构。
 type BlockChain struct {
@@ -52,7 +52,7 @@ func NewBlockChain(address string) *BlockChain {
 		// 创建创世块并录入数据库。
 		cbtx := NewCoinbaseTransaction(address, genesisCoinbase)
 		genesis := NewGenesisBlock(cbtx)
-		genesis.AddToBucket(bucket)
+		genesis.StoreInBucket(bucket)
 		rear = genesis.Hash
 		return nil
 	})
@@ -106,7 +106,7 @@ func (chain *BlockChain) AddBlock(transactions []*Transaction) {
 	newBlock := NewBlock(transactions, lastHash)
 	err = chain.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(blocksBucket))
-		newBlock.AddToBucket(bucket)
+		newBlock.StoreInBucket(bucket)
 		chain.rear = newBlock.Hash
 		return nil
 	})
