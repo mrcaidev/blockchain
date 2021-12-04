@@ -2,19 +2,13 @@ package main
 
 import (
 	"blockchain/blockchain"
+	"blockchain/cli"
 )
 
 func main() {
 	chain := blockchain.CreateBlockChain()
-	chain.AddBlock("Send 1 BTC to Ivan")
-	chain.AddBlock("Send 2 more BTC to Ivan")
+	defer chain.DB.Close()
 
-	iter := chain.Iterator()
-	for {
-		if len(iter.CurHash) == 0 {
-			break
-		}
-		curBlock := iter.Next()
-		curBlock.Print()
-	}
+	cli := cli.CreateCLI(chain)
+	cli.Run()
 }

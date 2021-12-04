@@ -1,6 +1,7 @@
 package blockchain
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/boltdb/bolt"
@@ -13,7 +14,7 @@ const blocksBucket = "blocks"
 // 区块链结构。
 type BlockChain struct {
 	rear []byte   // 最后一个记录的哈希值。
-	db   *bolt.DB // 数据库连接。
+	DB   *bolt.DB // 数据库连接。
 }
 
 // 创建区块链。
@@ -36,6 +37,7 @@ func CreateBlockChain() *BlockChain {
 			return nil
 		}
 		// 否则，新建一个区块链的bucket。
+		fmt.Println("No chain found. Creating a new one...")
 		bucket, err = tx.CreateBucket([]byte(blocksBucket))
 		if err != nil {
 			return err
@@ -57,7 +59,7 @@ func CreateBlockChain() *BlockChain {
 func (chain *BlockChain) AddBlock(data string) {
 	// 从数据库获取最后一个区块的哈希值。
 	var lastHash []byte
-	err := chain.db.View(func(tx *bolt.Tx) error {
+	err := chain.DB.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(blocksBucket))
 		lastHash = bucket.Get([]byte("l"))
 		return nil
@@ -68,7 +70,7 @@ func (chain *BlockChain) AddBlock(data string) {
 
 	// 创建新区块。
 	newBlock := CreateBlock(data, lastHash)
-	err = chain.db.Update(func(tx *bolt.Tx) error {
+	err = chain.DB.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(blocksBucket))
 		newBlock.AddToBucket(bucket)
 		chain.rear = newBlock.Hash
@@ -87,7 +89,7 @@ type BlockChainIterator struct {
 
 // 创建迭代器。
 func (chain *BlockChain) Iterator() *BlockChainIterator {
-	return &BlockChainIterator{chain.rear, chain.db}
+	return &BlockChainIterator{chain.rear, chain.DB}
 }
 
 // 从尾部开始遍历区块链。
