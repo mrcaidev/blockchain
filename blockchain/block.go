@@ -2,6 +2,7 @@ package blockchain
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"encoding/gob"
 	"fmt"
 	"log"
@@ -12,11 +13,33 @@ import (
 
 // 区块结构。
 type Block struct {
-	Timestamp     int64  // 区块时间戳。
-	Data          []byte // 数据。
-	PrevBlockHash []byte // 前一区块摘要值。
-	Hash          []byte // 区块标识。
-	Nonce         int    // 区块随机数。
+	Timestamp     int64          // 区块时间戳。
+	Transactions  []*Transaction // 交易列表。
+	PrevBlockHash []byte         // 前一区块摘要值。
+	Hash          []byte         // 区块标识。
+	Nonce         int            // 区块随机数。
+}
+
+// 创建区块。
+func NewBlock(transactions []*Transaction, prevBlockHash []byte) *Block {
+	// 录入时间戳、数据与前一区块摘要值。
+	block := &Block{
+		Timestamp:     time.Now().Unix(),
+		Transactions:  transactions,
+		PrevBlockHash: prevBlockHash,
+		Hash:          []byte{},
+		Nonce:         0,
+	}
+	// 证明工作量。
+	pow := CreatePow(block)
+	pow.Run()
+
+	return block
+}
+
+// 创建创世块。
+func NewGenesisBlock(coinbase *Transaction) *Block {
+	return NewBlock([]*Transaction{coinbase}, []byte{})
 }
 
 // 序列化区块。
@@ -41,29 +64,6 @@ func DeserializeBlock(seq []byte) *Block {
 	return &block
 }
 
-// 创建区块。
-func CreateBlock(data string, prevBlockHash []byte) *Block {
-	// 录入时间戳、数据与前一区块摘要值。
-	block := &Block{
-		Timestamp:     time.Now().Unix(),
-		Data:          []byte(data),
-		PrevBlockHash: prevBlockHash,
-		Hash:          []byte{},
-		Nonce:         0,
-	}
-	// 证明工作量。
-	fmt.Printf("Running PoW of block '%s'\n", block.Data)
-	pow := CreatePow(block)
-	pow.Run()
-
-	return block
-}
-
-// 创建创世块。
-func CreateGenesisBlock() *Block {
-	return CreateBlock("Genesis Block", []byte{})
-}
-
 // 将区块追加进数据库。
 func (block *Block) AddToBucket(bucket *bolt.Bucket) {
 	// 添加区块。
@@ -78,11 +78,27 @@ func (block *Block) AddToBucket(bucket *bolt.Bucket) {
 	}
 }
 
+// 计算区块内交易的哈希值。
+func (block *Block) TransactionHash() []byte {
+	var hashes [][]byte
+
+	for _, tx := range block.Transactions {
+		hashes = append(hashes, tx.ID)
+	}
+	generalHash := sha256.Sum256(bytes.Join(hashes, []byte{}))
+
+	return generalHash[:]
+}
+
 // 打印区块信息。
 func (block *Block) Print() {
 	fmt.Println("--------------------------------------------------------------------------------")
-	fmt.Printf("ID: %x\n", block.Hash)
-	fmt.Printf("Nonce: %d\n", block.Nonce)
-	fmt.Printf("Data: %s\n", block.Data)
+	fmt.Printf("Hash:      %x\n", block.Hash)
+	fmt.Printf("Nonce:     %d\n", block.Nonce)
+	fmt.Printf("Prev hash: %x\n", block.PrevBlockHash)
+	for index, tx := range block.Transactions {
+		fmt.Printf("Transaction %d:\n", index)
+		tx.Print()
+	}
 	fmt.Println("--------------------------------------------------------------------------------")
 }

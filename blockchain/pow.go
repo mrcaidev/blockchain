@@ -29,7 +29,7 @@ func (pow *Pow) joinBlockNonce(nonce int) []byte {
 	return bytes.Join(
 		[][]byte{
 			IntToBytes(pow.block.Timestamp),
-			pow.block.Data,
+			pow.block.TransactionHash(),
 			pow.block.PrevBlockHash,
 			IntToBytes(int64(nonce)),
 			IntToBytes(int64(difficulty)),

@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"log"
 	"math/big"
+	"os"
 )
 
 // 将整型数转换为字节切片。
@@ -22,4 +23,10 @@ func BytesToBigInt(bytes []byte) *big.Int {
 	var result big.Int
 	result.SetBytes(bytes)
 	return &result
+}
+
+// 检测文件是否存在。
+func hasFile(filename string) bool {
+	_, err := os.Stat(filename)
+	return !os.IsNotExist(err)
 }
