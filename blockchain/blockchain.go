@@ -26,7 +26,7 @@ func CreateBlockChain() *BlockChain {
 		log.Panic(err)
 	}
 
-	// 更新数据库。
+	// 从数据库读取目前的区块链信息。
 	err = db.Update(func(tx *bolt.Tx) error {
 		var bucket *bolt.Bucket
 		bucket = tx.Bucket([]byte(blocksBucket))
@@ -42,10 +42,7 @@ func CreateBlockChain() *BlockChain {
 		}
 		// 录入创世块。
 		genesis := CreateGenesisBlock()
-		err = genesis.AddToBucket(bucket)
-		if err != nil {
-			return err
-		}
+		genesis.AddToBucket(bucket)
 		// 记录创世块哈希值。
 		rear = genesis.Hash
 		return nil
@@ -82,15 +79,18 @@ func (chain *BlockChain) AddBlock(data string) {
 	}
 }
 
+// 区块链迭代器结构。
 type BlockChainIterator struct {
-	CurHash []byte
-	db      *bolt.DB
+	CurHash []byte   // 当前指向区块的哈希值。
+	db      *bolt.DB // 数据库连接。
 }
 
+// 创建迭代器。
 func (chain *BlockChain) Iterator() *BlockChainIterator {
 	return &BlockChainIterator{chain.rear, chain.db}
 }
 
+// 从尾部开始遍历区块链。
 func (iter *BlockChainIterator) Next() *Block {
 	// 获取迭代器当前指向的区块。
 	var block *Block

@@ -20,14 +20,14 @@ type Block struct {
 }
 
 // 序列化区块。
-func (b *Block) Serialize() []byte {
-	var result bytes.Buffer
-	encoder := gob.NewEncoder(&result)
-	err := encoder.Encode(b)
+func (block *Block) Serialize() []byte {
+	var seq bytes.Buffer
+	encoder := gob.NewEncoder(&seq)
+	err := encoder.Encode(block)
 	if err != nil {
 		log.Panic(err)
 	}
-	return result.Bytes()
+	return seq.Bytes()
 }
 
 // 反序列化区块。
@@ -65,19 +65,17 @@ func CreateGenesisBlock() *Block {
 }
 
 // 将区块追加进数据库。
-func (block *Block) AddToBucket(bucket *bolt.Bucket) error {
+func (block *Block) AddToBucket(bucket *bolt.Bucket) {
 	// 添加区块。
 	err := bucket.Put(block.Hash, block.Serialize())
 	if err != nil {
-		return err
+		log.Panic(err)
 	}
 	// 单独记录其哈希值，作为最后一个区块的哈希值。
 	err = bucket.Put([]byte("l"), block.Hash)
 	if err != nil {
-		return err
+		log.Panic(err)
 	}
-
-	return nil
 }
 
 // 打印区块信息。
