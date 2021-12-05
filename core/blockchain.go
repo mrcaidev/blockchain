@@ -8,7 +8,6 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 
 	tx "blockchain/transaction"
@@ -33,7 +32,7 @@ func NewBlockChain(address string) *BlockChain {
 	// 打开数据库。
 	db, err := bolt.Open(utils.DBFile, 0600, nil)
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 
 	// 创建coinbase交易和相应的创世块。
@@ -51,7 +50,7 @@ func NewBlockChain(address string) *BlockChain {
 		return nil
 	})
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 	return &BlockChain{rear, db}
 }
@@ -67,7 +66,7 @@ func LoadBlockChain() *BlockChain {
 	// 打开数据库。
 	db, err := bolt.Open(utils.DBFile, 0600, nil)
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 
 	// 从数据库读取目前的区块链信息。
@@ -78,7 +77,7 @@ func LoadBlockChain() *BlockChain {
 		return nil
 	})
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 	return &BlockChain{rear, db}
 }
@@ -90,7 +89,7 @@ func (chain *BlockChain) AddBlock(TXs []*tx.Transaction) {
 
 	for _, TX := range TXs {
 		if !chain.VerifyTX(TX) {
-			log.Panic("[Error] Invalid transaction.")
+			panic("[Error] Invalid transaction.")
 		}
 	}
 
@@ -100,7 +99,7 @@ func (chain *BlockChain) AddBlock(TXs []*tx.Transaction) {
 		return nil
 	})
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 
 	// 创建新区块。
@@ -112,7 +111,7 @@ func (chain *BlockChain) AddBlock(TXs []*tx.Transaction) {
 		return nil
 	})
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 }
 
@@ -229,7 +228,7 @@ func (chain *BlockChain) SignTX(TX *tx.Transaction, privkey ecdsa.PrivateKey) {
 	for _, input := range TX.Inputs {
 		prevTx, err := chain.FindTX(input.RefID)
 		if err != nil {
-			log.Panic(err)
+			panic(err)
 		}
 		prevTxs[hex.EncodeToString(prevTx.ID)] = prevTx
 	}
@@ -241,7 +240,7 @@ func (chain *BlockChain) VerifyTX(TX *tx.Transaction) bool {
 	for _, input := range TX.Inputs {
 		prevTx, err := chain.FindTX(input.RefID)
 		if err != nil {
-			log.Panic(err)
+			panic(err)
 		}
 		prevTxs[hex.EncodeToString(prevTx.ID)] = prevTx
 	}
@@ -263,14 +262,14 @@ func (chain *BlockChain) NewUTXOTX(from string, to string, cost int) *tx.Transac
 
 	// 如果发起方的钱不够了，就报错退出。
 	if deposit < cost {
-		log.Panic("[Error] Not enough money.")
+		panic("[Error] Not enough money.")
 	}
 
 	// 创建输入。
 	for txid, output := range UTXOToPay {
 		txID, err := hex.DecodeString(txid)
 		if err != nil {
-			log.Panic(err)
+			panic(err)
 		}
 		for _, out := range output {
 			inputs = append(inputs, tx.TXI{

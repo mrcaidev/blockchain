@@ -7,7 +7,6 @@ import (
 	"encoding/gob"
 	"fmt"
 	"io/ioutil"
-	"log"
 )
 
 // 钱包集结构。
@@ -34,7 +33,7 @@ func (wallets *Wallets) LoadFromFile() {
 	// 读取数据库。
 	seq, err := ioutil.ReadFile(utils.WalletsFile)
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 	wallets.Wallets = DeserializeWallets(seq).Wallets
 }
@@ -65,7 +64,7 @@ func (wallets *Wallets) GetWallet(address string) *Wallet {
 func (wallets *Wallets) Store() {
 	err := ioutil.WriteFile(utils.WalletsFile, wallets.Serialize(), 0644)
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 }
 
@@ -76,7 +75,7 @@ func (wallets *Wallets) Serialize() []byte {
 	encoder := gob.NewEncoder(&seq)
 	err := encoder.Encode(wallets)
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 	return seq.Bytes()
 }
@@ -88,7 +87,7 @@ func DeserializeWallets(seq []byte) *Wallets {
 	decoder := gob.NewDecoder(bytes.NewReader(seq))
 	err := decoder.Decode(&wallets)
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 	return &wallets
 }

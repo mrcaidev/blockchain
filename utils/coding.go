@@ -3,7 +3,6 @@ package utils
 import (
 	"bytes"
 	"crypto/sha256"
-	"log"
 	"math/big"
 
 	"golang.org/x/crypto/ripemd160"
@@ -73,7 +72,7 @@ func HashPubKey(pubkey []byte) []byte {
 	hasher := ripemd160.New()
 	_, err := hasher.Write(pubSHA[:])
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 	return hasher.Sum(nil)
 }

@@ -3,7 +3,6 @@ package utils
 import (
 	"bytes"
 	"encoding/binary"
-	"log"
 	"math/big"
 	"os"
 )
@@ -13,7 +12,7 @@ func IntToBytes(num int64) []byte {
 	buffer := new(bytes.Buffer)
 	err := binary.Write(buffer, binary.BigEndian, num)
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 	return buffer.Bytes()
 }

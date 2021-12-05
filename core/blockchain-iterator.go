@@ -2,7 +2,6 @@ package core
 
 import (
 	"blockchain/utils"
-	"log"
 
 	"github.com/boltdb/bolt"
 )
@@ -29,7 +28,7 @@ func (iter *BlockChainIterator) Next() *Block {
 		return nil
 	})
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 	// 迭代器移向前一个区块。
 	iter.curHash = block.PrevBlockHash

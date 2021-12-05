@@ -5,7 +5,6 @@ import (
 	"crypto/ecdsa"
 	"crypto/elliptic"
 	"crypto/rand"
-	"log"
 )
 
 // 钱包结构。
@@ -34,7 +33,7 @@ func newKeyPair() (ecdsa.PrivateKey, []byte) {
 	curve := elliptic.P256()
 	privkey, err := ecdsa.GenerateKey(curve, rand.Reader)
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 
 	pubkey := append(privkey.PublicKey.X.Bytes(), privkey.Y.Bytes()...)

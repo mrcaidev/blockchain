@@ -9,7 +9,6 @@ import (
 	"encoding/gob"
 	"encoding/hex"
 	"fmt"
-	"log"
 	"math/big"
 
 	"blockchain/utils"
@@ -38,7 +37,7 @@ func (tx *Transaction) Serialize() []byte {
 	encoder := gob.NewEncoder(&buffer)
 	err := encoder.Encode(tx)
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 	return buffer.Bytes()
 }
@@ -78,7 +77,7 @@ func (tx *Transaction) Sign(privkey ecdsa.PrivateKey, prevTxs map[string]*Transa
 	// 检查各输入的ID是否正确。
 	for _, input := range tx.Inputs {
 		if prevTxs[hex.EncodeToString(input.RefID)].ID == nil {
-			log.Panic("[Error] Previous transaction incorrect.")
+			panic("[Error] Previous transaction incorrect.")
 		}
 	}
 
@@ -92,7 +91,7 @@ func (tx *Transaction) Sign(privkey ecdsa.PrivateKey, prevTxs map[string]*Transa
 
 		r, s, err := ecdsa.Sign(rand.Reader, &privkey, txCopy.ID)
 		if err != nil {
-			log.Panic(err)
+			panic(err)
 		}
 		tx.Inputs[index].Signature = append(r.Bytes(), s.Bytes()...)
 	}
@@ -108,7 +107,7 @@ func (tx *Transaction) Verify(prevTxs map[string]*Transaction) bool {
 	// 检查各输入的ID是否正确。
 	for _, input := range tx.Inputs {
 		if prevTxs[hex.EncodeToString(input.RefID)].ID == nil {
-			log.Panic("[Error] Previous transaction incorrect.")
+			panic("[Error] Previous transaction incorrect.")
 		}
 	}
 

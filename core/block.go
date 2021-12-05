@@ -5,7 +5,6 @@ import (
 	"crypto/sha256"
 	"encoding/gob"
 	"fmt"
-	"log"
 	"time"
 
 	tx "blockchain/transaction"
@@ -51,7 +50,7 @@ func (block *Block) Serialize() []byte {
 	encoder := gob.NewEncoder(&seq)
 	err := encoder.Encode(block)
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 	return seq.Bytes()
 }
@@ -62,7 +61,7 @@ func DeserializeBlock(seq []byte) *Block {
 	decoder := gob.NewDecoder(bytes.NewReader(seq))
 	err := decoder.Decode(&block)
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 	return &block
 }
@@ -72,12 +71,12 @@ func (block *Block) StoreInBucket(bucket *bolt.Bucket) {
 	// 添加区块。
 	err := bucket.Put(block.Hash, block.Serialize())
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 	// 单独记录其哈希值，作为最后一个区块的哈希值。
 	err = bucket.Put([]byte("l"), block.Hash)
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 }
 
