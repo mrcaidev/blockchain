@@ -1,43 +1,38 @@
 package cli
 
 import (
+	"errors"
 	"flag"
-	"fmt"
-	"log"
 	"os"
 	"strconv"
 )
 
-// 命令行结构。
-type CLI struct{}
-
-// 检验参数。
-func validateArgs() {
-	if len(os.Args) < 2 {
-		fmt.Println("[Error] No command given!")
-		showHelp()
-		os.Exit(1)
-	}
-}
-
 // 运行命令行实例。
-func (cli *CLI) Run() {
-	validateArgs()
+func Run() {
+	// 验证是否给出命令。
+	if len(os.Args) < 2 {
+		panic("[Error] Command not given! Use command `help` to check out usage.")
+	}
 
-	// 自定义命令行指令。
+	// 区块链创建。
 	chainCmd := flag.NewFlagSet("chain", flag.ExitOnError)
+	chainAddr := chainCmd.String("address", "", "The address who mined out genesis block.")
+	// 钱包创建。
 	walletCmd := flag.NewFlagSet("wallet", flag.ExitOnError)
+	// 地址展示。
 	listCmd := flag.NewFlagSet("list", flag.ExitOnError)
+	// 余额查询。
 	balanceCmd := flag.NewFlagSet("balance", flag.ExitOnError)
-	sendCmd := flag.NewFlagSet("send", flag.ExitOnError)
+	balanceAddr := balanceCmd.String("address", "", "The address being queried.")
+	// 交易。
+	tradeCmd := flag.NewFlagSet("trade", flag.ExitOnError)
+	tradeFrom := tradeCmd.String("from", "", "Source wallet address.")
+	tradeTo := tradeCmd.String("to", "", "Destination wallet address.")
+	tradeAmount := tradeCmd.String("amount", "0", "Amount of coins to trade.")
+	// 区块链打印。
 	printCmd := flag.NewFlagSet("print", flag.ExitOnError)
+	// 帮助信息。
 	helpCmd := flag.NewFlagSet("help", flag.ExitOnError)
-
-	newChainAddr := chainCmd.String("address", "", "The address to which rewards should be sent")
-	balanceAddr := balanceCmd.String("address", "", "The address whose balance is being queried.")
-	sendFrom := sendCmd.String("from", "", "Source wallet address")
-	sendTo := sendCmd.String("to", "", "Destination wallet address")
-	sendAmount := sendCmd.String("amount", "0", "Amount of coins")
 
 	// 解析命令行参数。
 	var err error
@@ -51,25 +46,25 @@ func (cli *CLI) Run() {
 	case "balance":
 		err = balanceCmd.Parse(os.Args[2:])
 	case "send":
-		err = sendCmd.Parse(os.Args[2:])
+		err = tradeCmd.Parse(os.Args[2:])
 	case "print":
 		err = printCmd.Parse(os.Args[2:])
 	case "help":
 		err = helpCmd.Parse(os.Args[2:])
 	default:
 		showHelp()
-		os.Exit(1)
+		err = errors.New("command not supported! Use command `help` to check out usage")
 	}
 	if err != nil {
-		log.Panic(err)
+		panic(err)
 	}
 
 	if chainCmd.Parsed() {
-		if *newChainAddr == "" {
+		if *chainAddr == "" {
 			chainCmd.Usage()
 			os.Exit(1)
 		}
-		newChain(*newChainAddr)
+		newChain(*chainAddr)
 
 	} else if walletCmd.Parsed() {
 		newWallet()
@@ -84,17 +79,17 @@ func (cli *CLI) Run() {
 		}
 		queryBalance(*balanceAddr)
 
-	} else if sendCmd.Parsed() {
-		amount, err := strconv.Atoi(*sendAmount)
+	} else if tradeCmd.Parsed() {
+		amount, err := strconv.Atoi(*tradeAmount)
 		if err != nil {
-			sendCmd.Usage()
+			tradeCmd.Usage()
 			os.Exit(1)
 		}
-		if *sendFrom == "" || *sendTo == "" || amount <= 0 {
-			sendCmd.Usage()
+		if *tradeFrom == "" || *tradeTo == "" || amount <= 0 {
+			tradeCmd.Usage()
 			os.Exit(1)
 		}
-		send(*sendFrom, *sendTo, amount)
+		send(*tradeFrom, *tradeTo, amount)
 
 	} else if printCmd.Parsed() {
 		print()

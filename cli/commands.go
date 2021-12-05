@@ -6,13 +6,12 @@ import (
 	"blockchain/utils"
 	"blockchain/wallet"
 	"fmt"
-	"log"
 )
 
 // 创建新区块链。
 func newChain(address string) {
 	if !utils.ValidateAddress(address) {
-		log.Panic("[Error] Invalid address!")
+		panic("[Error] Invalid address!")
 	}
 	chain := core.NewBlockChain(address)
 	chain.CloseDatabase()
@@ -30,7 +29,7 @@ func newWallet() {
 // 查询余额。
 func queryBalance(address string) {
 	if !utils.ValidateAddress(address) {
-		log.Panic("[Error] Invalid address!")
+		panic("[Error] Invalid address!")
 	}
 	chain := core.LoadBlockChain()
 	defer chain.CloseDatabase()
@@ -57,10 +56,10 @@ func listAddresses() {
 // 发送币。
 func send(from string, to string, amount int) {
 	if !utils.ValidateAddress(from) {
-		log.Panic("[Error] Invalid <from>!")
+		panic("[Error] Invalid <from>!")
 	}
 	if !utils.ValidateAddress(to) {
-		log.Panic("[Error] Invalid <to>!")
+		panic("[Error] Invalid <to>!")
 	}
 	chain := core.LoadBlockChain()
 	defer chain.CloseDatabase()
