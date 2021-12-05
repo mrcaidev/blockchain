@@ -84,9 +84,16 @@ func LoadBlockChain() *BlockChain {
 }
 
 // 添加区块。
-func (chain *BlockChain) AddBlock(transactions []*tx.Transaction) {
+func (chain *BlockChain) AddBlock(TXs []*tx.Transaction) {
 	// 从数据库获取最后一个区块的哈希值。
 	var lastHash []byte
+
+	for _, TX := range TXs {
+		if !chain.VerifyTX(TX) {
+			log.Panic("[Error] Invalid transaction.")
+		}
+	}
+
 	err := chain.db.View(func(t *bolt.Tx) error {
 		bucket := t.Bucket([]byte(utils.BlocksBucket))
 		lastHash = bucket.Get([]byte("l"))
@@ -97,7 +104,7 @@ func (chain *BlockChain) AddBlock(transactions []*tx.Transaction) {
 	}
 
 	// 创建新区块。
-	newBlock := NewBlock(transactions, lastHash)
+	newBlock := NewBlock(TXs, lastHash)
 	err = chain.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(utils.BlocksBucket))
 		newBlock.StoreInBucket(bucket)
