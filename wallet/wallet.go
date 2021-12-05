@@ -21,9 +21,9 @@ func NewWallet() *Wallet {
 
 // 获取钱包地址。
 func (wallet *Wallet) Address() string {
-	pubkeyHash := utils.HashPubKey(wallet.PublicKey)
+	pubkeyHash := utils.GetPubkeyHash(wallet.PublicKey)
 	payloadWithVersion := append([]byte{utils.Version}, pubkeyHash...)
-	checksum := utils.Checksum(payloadWithVersion)
+	checksum := utils.GetChecksum(payloadWithVersion)
 	finalPayload := append(payloadWithVersion, checksum...)
 	return string(utils.Base58Encode(finalPayload))
 }

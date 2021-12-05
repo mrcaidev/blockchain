@@ -256,7 +256,7 @@ func (chain *BlockChain) NewUTXOTX(from string, to string, cost int) *tx.Transac
 
 	wallets := wallet.NewWallets()
 	wallet := wallets.GetWallet(from)
-	pubkeyHash := utils.HashPubKey(wallet.PublicKey)
+	pubkeyHash := utils.GetPubkeyHash(wallet.PublicKey)
 
 	deposit, UTXOToPay := chain.FindUTXOToPay(pubkeyHash, cost)
 

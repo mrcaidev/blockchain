@@ -14,6 +14,6 @@ type TXI struct {
 }
 
 func (txi *TXI) UsesKey(pubkeyHash []byte) bool {
-	lockingHash := utils.HashPubKey(txi.Pubkey)
+	lockingHash := utils.GetPubkeyHash(txi.Pubkey)
 	return bytes.Equal(lockingHash, pubkeyHash)
 }

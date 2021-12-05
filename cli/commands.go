@@ -10,7 +10,7 @@ import (
 
 // 创建新区块链。
 func newChain(address string) {
-	if !utils.ValidateAddress(address) {
+	if !utils.IsValidAddress(address) {
 		panic("[Error] Invalid address!")
 	}
 	chain := core.NewBlockChain(address)
@@ -28,7 +28,7 @@ func newWallet() {
 
 // 查询余额。
 func queryBalance(address string) {
-	if !utils.ValidateAddress(address) {
+	if !utils.IsValidAddress(address) {
 		panic("[Error] Invalid address!")
 	}
 	chain := core.LoadBlockChain()
@@ -55,10 +55,10 @@ func listAddresses() {
 
 // 发送币。
 func send(from string, to string, amount int) {
-	if !utils.ValidateAddress(from) {
+	if !utils.IsValidAddress(from) {
 		panic("[Error] Invalid <from>!")
 	}
-	if !utils.ValidateAddress(to) {
+	if !utils.IsValidAddress(to) {
 		panic("[Error] Invalid <to>!")
 	}
 	chain := core.LoadBlockChain()

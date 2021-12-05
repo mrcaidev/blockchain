@@ -8,35 +8,42 @@ import (
 	"golang.org/x/crypto/ripemd160"
 )
 
+// Base58 字母表。
 var alphabet = []byte("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
 
-// Base58编码。
-func Base58Encode(input []byte) []byte {
-	var result []byte
-	x := big.NewInt(0).SetBytes(input)
-	base := big.NewInt(int64(len(alphabet)))
-	zero := big.NewInt(0)
-	mod := &big.Int{}
+// Base58 基数。
+const base = 58
 
-	for x.Cmp(zero) != 0 {
-		x.DivMod(x, base, mod)
-		result = append(result, alphabet[mod.Int64()])
+// 校验和字节长度。
+const checksumLen = 4
+
+// Base58 编码。
+func Base58Encode(input []byte) []byte {
+	output := []byte{}
+	bigInput := BytesToBigInt(input)
+	bigBase := big.NewInt(int64(base))
+	bigZero := big.NewInt(0)
+	mod := big.NewInt(0)
+
+	for bigInput.Cmp(bigZero) != 0 {
+		bigInput.DivMod(bigInput, bigBase, mod)
+		output = append(output, alphabet[mod.Int64()])
 	}
 
-	result = reverseBytes(result)
+	output = reverseBytes(output)
 	for b := range input {
 		if b == 0x00 {
-			result = append([]byte{alphabet[0]}, result...)
+			output = append([]byte{alphabet[0]}, output...)
 		} else {
 			break
 		}
 	}
-	return result
+	return output
 }
 
-// Base58解码。
+// Base58 解码。
 func Base58Decode(input []byte) []byte {
-	result := big.NewInt(0)
+	output := big.NewInt(0)
 	zeroBytes := 0
 
 	for b := range input {
@@ -48,31 +55,38 @@ func Base58Decode(input []byte) []byte {
 	payload := input[zeroBytes:]
 	for _, b := range payload {
 		charIndex := bytes.IndexByte(alphabet, b)
-		result.Mul(result, big.NewInt(58))
-		result.Add(result, big.NewInt(int64(charIndex)))
+		output.Mul(output, big.NewInt(base))
+		output.Add(output, big.NewInt(int64(charIndex)))
 	}
 
-	decoded := result.Bytes()
+	decoded := output.Bytes()
 	decoded = append(bytes.Repeat([]byte{byte(0x00)}, zeroBytes), decoded...)
 	return decoded
 }
 
-// 翻转byte数据。
+// 首尾翻转 []byte 类型的数据。
 func reverseBytes(input []byte) []byte {
-	var result []byte
-	for i := len(input) - 1; i >= 0; i-- {
-		result = append(result, input[i])
+	output := []byte{}
+	for pos := len(input) - 1; pos >= 0; pos-- {
+		output = append(output, input[pos])
 	}
-	return result
+	return output
 }
 
-// 计算公钥的哈希值。
-func HashPubKey(pubkey []byte) []byte {
-	pubSHA := sha256.Sum256(pubkey)
-	hasher := ripemd160.New()
-	_, err := hasher.Write(pubSHA[:])
+// 计算公钥的哈希值。（SHA256 + RIPEMD）
+func GetPubkeyHash(pubkey []byte) []byte {
+	first := sha256.Sum256(pubkey)
+	ripemdHasher := ripemd160.New()
+	_, err := ripemdHasher.Write(first[:])
 	if err != nil {
 		panic(err)
 	}
-	return hasher.Sum(nil)
+	return ripemdHasher.Sum(nil)
+}
+
+// 计算校验和。（两次 SHA256）
+func GetChecksum(payload []byte) []byte {
+	first := sha256.Sum256(payload)
+	second := sha256.Sum256(first[:])
+	return second[:checksumLen]
 }

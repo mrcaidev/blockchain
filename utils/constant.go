@@ -5,9 +5,6 @@ import "math"
 // 挖矿的奖励。
 const Subsidy = 10
 
-// 校验和长度。
-const ChecksumLen = 4
-
 // 钱包集数据库。
 const WalletsFile = "wallets.dat"
 
