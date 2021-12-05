@@ -1,4 +1,4 @@
-package blockchain
+package core
 
 import (
 	"bytes"
@@ -8,20 +8,22 @@ import (
 	"log"
 	"time"
 
+	tx "blockchain/transaction"
+
 	"github.com/boltdb/bolt"
 )
 
 // 区块结构。
 type Block struct {
-	Timestamp     int64          // 区块时间戳。
-	Transactions  []*Transaction // 交易列表。
-	PrevBlockHash []byte         // 前一区块摘要值。
-	Hash          []byte         // 区块标识。
-	Nonce         int            // 区块随机数。
+	Timestamp     int64             // 区块时间戳。
+	Transactions  []*tx.Transaction // 交易列表。
+	PrevBlockHash []byte            // 前一区块摘要值。
+	Hash          []byte            // 区块标识。
+	Nonce         int               // 区块随机数。
 }
 
 // 创建区块。
-func NewBlock(transactions []*Transaction, prevBlockHash []byte) *Block {
+func NewBlock(transactions []*tx.Transaction, prevBlockHash []byte) *Block {
 	// 录入时间戳、数据与前一区块摘要值。
 	block := &Block{
 		Timestamp:     time.Now().Unix(),
@@ -39,8 +41,8 @@ func NewBlock(transactions []*Transaction, prevBlockHash []byte) *Block {
 }
 
 // 创建创世块。
-func NewGenesisBlock(coinbase *Transaction) *Block {
-	return NewBlock([]*Transaction{coinbase}, []byte{})
+func NewGenesisBlock(coinbase *tx.Transaction) *Block {
+	return NewBlock([]*tx.Transaction{coinbase}, []byte{})
 }
 
 // 序列化区块。

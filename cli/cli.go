@@ -12,26 +12,29 @@ import (
 type CLI struct{}
 
 // 检验参数。
-func (cli *CLI) validate() {
+func validateArgs() {
 	if len(os.Args) < 2 {
 		fmt.Println("[Error] No command given!")
-		cli.showHelp()
+		showHelp()
 		os.Exit(1)
 	}
 }
 
 // 运行命令行实例。
 func (cli *CLI) Run() {
-	cli.validate()
+	validateArgs()
+
 	// 自定义命令行指令。
-	newCmd := flag.NewFlagSet("new", flag.ExitOnError)
+	chainCmd := flag.NewFlagSet("chain", flag.ExitOnError)
+	walletCmd := flag.NewFlagSet("wallet", flag.ExitOnError)
+	listCmd := flag.NewFlagSet("list", flag.ExitOnError)
 	balanceCmd := flag.NewFlagSet("balance", flag.ExitOnError)
 	sendCmd := flag.NewFlagSet("send", flag.ExitOnError)
 	printCmd := flag.NewFlagSet("print", flag.ExitOnError)
 	helpCmd := flag.NewFlagSet("help", flag.ExitOnError)
 
-	newAddress := newCmd.String("address", "", "The address to which rewards should be sent")
-	balanceAddress := balanceCmd.String("address", "", "The address whose balance is being queried.")
+	newChainAddr := chainCmd.String("address", "", "The address to which rewards should be sent")
+	balanceAddr := balanceCmd.String("address", "", "The address whose balance is being queried.")
 	sendFrom := sendCmd.String("from", "", "Source wallet address")
 	sendTo := sendCmd.String("to", "", "Destination wallet address")
 	sendAmount := sendCmd.String("amount", "0", "Amount of coins")
@@ -39,8 +42,12 @@ func (cli *CLI) Run() {
 	// 解析命令行参数。
 	var err error
 	switch os.Args[1] {
-	case "new":
-		err = newCmd.Parse(os.Args[2:])
+	case "chain":
+		err = chainCmd.Parse(os.Args[2:])
+	case "wallet":
+		err = walletCmd.Parse(os.Args[2:])
+	case "list":
+		err = listCmd.Parse(os.Args[2:])
 	case "balance":
 		err = balanceCmd.Parse(os.Args[2:])
 	case "send":
@@ -50,27 +57,32 @@ func (cli *CLI) Run() {
 	case "help":
 		err = helpCmd.Parse(os.Args[2:])
 	default:
-		cli.showHelp()
+		showHelp()
 		os.Exit(1)
 	}
 	if err != nil {
 		log.Panic(err)
 	}
 
-	// 如果是添加区块命令。
-	if newCmd.Parsed() {
-		if *newAddress == "" {
-			newCmd.Usage()
+	if chainCmd.Parsed() {
+		if *newChainAddr == "" {
+			chainCmd.Usage()
 			os.Exit(1)
 		}
-		cli.newChain(*newAddress)
+		newChain(*newChainAddr)
+
+	} else if walletCmd.Parsed() {
+		newWallet()
+
+	} else if listCmd.Parsed() {
+		listAddresses()
 
 	} else if balanceCmd.Parsed() {
-		if *balanceAddress == "" {
+		if *balanceAddr == "" {
 			balanceCmd.Usage()
 			os.Exit(1)
 		}
-		cli.queryBalance(*balanceAddress)
+		queryBalance(*balanceAddr)
 
 	} else if sendCmd.Parsed() {
 		amount, err := strconv.Atoi(*sendAmount)
@@ -82,11 +94,12 @@ func (cli *CLI) Run() {
 			sendCmd.Usage()
 			os.Exit(1)
 		}
-		cli.send(*sendFrom, *sendTo, amount)
+		send(*sendFrom, *sendTo, amount)
 
 	} else if printCmd.Parsed() {
-		cli.print()
+		print()
+
 	} else if helpCmd.Parsed() {
-		cli.showHelp()
+		showHelp()
 	}
 }

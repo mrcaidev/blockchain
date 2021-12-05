@@ -1,4 +1,4 @@
-package blockchain
+package utils
 
 import (
 	"bytes"
@@ -26,7 +26,7 @@ func BytesToBigInt(bytes []byte) *big.Int {
 }
 
 // 检测文件是否存在。
-func hasFile(filename string) bool {
+func HasFile(filename string) bool {
 	_, err := os.Stat(filename)
 	return !os.IsNotExist(err)
 }
