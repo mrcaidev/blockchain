@@ -8,8 +8,8 @@ import (
 // 判断是否是有效地址。
 func IsValidAddress(address string) bool {
 	pubkeyHash := Base58Decode([]byte(address))
-	actualChecksum := pubkeyHash[len(pubkeyHash)-checksumLen:]
-	supposedChecksum := GetChecksum(pubkeyHash[:len(pubkeyHash)-checksumLen])
+	actualChecksum := pubkeyHash[len(pubkeyHash)-ChecksumLen:]
+	supposedChecksum := GetChecksum(pubkeyHash[:len(pubkeyHash)-ChecksumLen])
 	return bytes.Equal(actualChecksum, supposedChecksum)
 }
 

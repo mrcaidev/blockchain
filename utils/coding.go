@@ -13,7 +13,7 @@ var alphabet = []byte("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxy
 var base = big.NewInt(58)
 
 // 校验和字节长度。
-const checksumLen = 4
+const ChecksumLen = 4
 
 // Base58 编码。
 func Base58Encode(input []byte) []byte {
@@ -85,5 +85,5 @@ func GetPubkeyHash(pubkey []byte) []byte {
 func GetChecksum(payload []byte) []byte {
 	first := sha256.Sum256(payload)
 	second := sha256.Sum256(first[:])
-	return second[:checksumLen]
+	return second[:ChecksumLen]
 }
