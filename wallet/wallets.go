@@ -13,14 +13,14 @@ const walletsPath = "wallets.dat"
 
 // 钱包集结构。
 type Wallets struct {
-	Wallets map[string]*Wallet // 钱包地址 - 钱包内容。
+	Wallets map[string]*wallet // 钱包地址 - 钱包内容。
 }
 
 // 创建钱包集。
 func LoadWallets() *Wallets {
 	// 如果数据库不存在，就返回空钱包集。
 	if !utils.HasFile(walletsPath) {
-		return &Wallets{make(map[string]*Wallet)}
+		return &Wallets{make(map[string]*wallet)}
 	}
 
 	// 从数据库读取目前的钱包集信息。
@@ -33,42 +33,42 @@ func LoadWallets() *Wallets {
 }
 
 // 向钱包集添加钱包。
-func (wallets *Wallets) AddWallet() string {
-	wallet := NewWallet()
+func (ws *Wallets) AddWallet() string {
+	wallet := newWallet()
 	address := wallet.address()
-	wallets.Wallets[address] = wallet
+	ws.Wallets[address] = wallet
 	return address
 }
 
 // 获取各钱包的地址。
-func (wallets *Wallets) Addresses() []string {
+func (ws *Wallets) Addresses() []string {
 	var addresses []string
-	for address := range wallets.Wallets {
+	for address := range ws.Wallets {
 		addresses = append(addresses, address)
 	}
 	return addresses
 }
 
 // 获取指定地址的钱包。
-func (wallets *Wallets) GetWallet(address string) *Wallet {
-	return wallets.Wallets[address]
+func (ws *Wallets) GetWallet(address string) *wallet {
+	return ws.Wallets[address]
 }
 
 // 将钱包集存储进数据库。
-func (wallets *Wallets) Persist() {
-	err := ioutil.WriteFile(walletsPath, wallets.serialize(), 0644)
+func (ws *Wallets) Persist() {
+	err := ioutil.WriteFile(walletsPath, ws.serialize(), 0644)
 	if err != nil {
 		panic(err)
 	}
 }
 
 // 序列化钱包集。
-func (wallets *Wallets) serialize() []byte {
+func (ws *Wallets) serialize() []byte {
 	var seq bytes.Buffer
 
 	gob.Register(elliptic.P256())
 	encoder := gob.NewEncoder(&seq)
-	err := encoder.Encode(wallets)
+	err := encoder.Encode(ws)
 	if err != nil {
 		panic(err)
 	}
