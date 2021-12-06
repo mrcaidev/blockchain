@@ -36,9 +36,9 @@ func (chain *Chain) NewUTXOTX(from string, to string, cost int) *tx.Transaction 
 		outputs []*tx.TXOutput
 	)
 
-	wallets := wallet.NewWallets()
+	wallets := wallet.LoadWallets()
 	wallet := wallets.GetWallet(from)
-	pubkeyHash := utils.GetPubkeyHash(wallet.PublicKey)
+	pubkeyHash := utils.GetPubkeyHash(wallet.Pubkey)
 
 	deposit, UTXOToPay := chain.FindUTXOToPay(pubkeyHash, cost)
 
@@ -54,7 +54,7 @@ func (chain *Chain) NewUTXOTX(from string, to string, cost int) *tx.Transaction 
 			panic(err)
 		}
 		for _, out := range utxo {
-			inputs = append(inputs, tx.NewTXI(txID, out, nil, wallet.PublicKey))
+			inputs = append(inputs, tx.NewTXI(txID, out, nil, wallet.Pubkey))
 		}
 	}
 
@@ -73,6 +73,6 @@ func (chain *Chain) NewUTXOTX(from string, to string, cost int) *tx.Transaction 
 		Outputs: outputs,
 	}
 	newTX.ID = newTX.Hash()
-	chain.SignTX(&newTX, wallet.PrivateKey)
+	chain.SignTX(&newTX, wallet.Privkey)
 	return &newTX
 }

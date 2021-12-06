@@ -20,9 +20,9 @@ func newChain(address string) {
 
 // 创建新钱包。
 func newWallet() {
-	wallets := wallet.NewWallets()
+	wallets := wallet.LoadWallets()
 	address := wallets.AddWallet()
-	wallets.Store()
+	wallets.Persist()
 	fmt.Printf("New address: %s\n", address)
 }
 
@@ -47,7 +47,7 @@ func balance(address string) {
 
 // 列出地址列表。
 func list() {
-	wallets := wallet.NewWallets()
+	wallets := wallet.LoadWallets()
 	for index, addr := range wallets.Addresses() {
 		fmt.Printf("Address %d: %s\n", index, addr)
 	}

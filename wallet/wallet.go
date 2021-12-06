@@ -12,8 +12,8 @@ const version = byte(0x00)
 
 // 钱包结构。
 type Wallet struct {
-	PrivateKey ecdsa.PrivateKey // 私钥。
-	PublicKey  []byte           // 公钥。
+	Privkey ecdsa.PrivateKey // 私钥。
+	Pubkey  []byte           // 公钥。
 }
 
 // 创建钱包。
@@ -23,22 +23,26 @@ func NewWallet() *Wallet {
 }
 
 // 获取钱包地址。
-func (wallet *Wallet) Address() string {
-	pubkeyHash := utils.GetPubkeyHash(wallet.PublicKey)
-	payloadWithVersion := append([]byte{version}, pubkeyHash...)
-	checksum := utils.GetChecksum(payloadWithVersion)
-	finalPayload := append(payloadWithVersion, checksum...)
+// 算法：地址 = (版本号 + 公钥哈希 + 校验和) 的 Base58 编码。
+func (wallet *Wallet) address() string {
+	pubkeyHash := utils.GetPubkeyHash(wallet.Pubkey)
+	payload := append([]byte{version}, pubkeyHash...)
+	checksum := utils.GetChecksum(payload)
+	finalPayload := append(payload, checksum...)
 	return string(utils.Base58Encode(finalPayload))
 }
 
 // 创建新公钥-私钥对。
 func newKeyPair() (ecdsa.PrivateKey, []byte) {
+	// 椭圆加密产生私钥。
 	curve := elliptic.P256()
 	privkey, err := ecdsa.GenerateKey(curve, rand.Reader)
 	if err != nil {
 		panic(err)
 	}
 
+	// 由私钥衍生出公钥。
 	pubkey := append(privkey.PublicKey.X.Bytes(), privkey.Y.Bytes()...)
+
 	return *privkey, pubkey
 }
