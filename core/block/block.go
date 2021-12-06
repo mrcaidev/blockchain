@@ -6,50 +6,51 @@ import (
 	"fmt"
 	"time"
 
-	tx "blockchain/transaction"
+	"blockchain/transaction"
 )
 
 // 区块结构。
 type Block struct {
-	Timestamp     int64             // 区块时间戳。
-	Transactions  []*tx.Transaction // 交易列表。
-	PrevBlockHash []byte            // 前一区块摘要值。
-	Hash          []byte            // 区块标识。
-	Nonce         int               // 区块随机数。
+	Timestamp     int64                      // 区块时间戳。
+	Transactions  []*transaction.Transaction // 交易列表。
+	PrevBlockHash []byte                     // 前一区块摘要值。
+	Hash          []byte                     // 区块标识。
+	Nonce         int                        // 区块随机数。
 }
 
 // 创建区块。
-func NewBlock(TXs []*tx.Transaction, prevBlockHash []byte) *Block {
+func NewBlock(txs []*transaction.Transaction, prevBlockHash []byte) *Block {
 	block := &Block{
 		Timestamp:     time.Now().Unix(),
-		Transactions:  TXs,
+		Transactions:  txs,
 		PrevBlockHash: prevBlockHash,
 		Hash:          []byte{},
 		Nonce:         0,
 	}
 
-	fmt.Println("Mining block of this transaction...")
-	proof := newPow(block)
-	proof.Run()
+	// 证明工作量。
+	fmt.Println("Mining new block...")
+	pow := newPow(block)
+	pow.Run()
 
 	return block
 }
 
 // 创建创世块。
-func NewGenesisBlock(coinbaseTX *tx.Transaction) *Block {
-	return NewBlock([]*tx.Transaction{coinbaseTX}, []byte{})
+func NewGenesisBlock(coinbaseTx *transaction.Transaction) *Block {
+	return NewBlock([]*transaction.Transaction{coinbaseTx}, []byte{})
 }
 
 // 打印区块信息。
-func (block *Block) Print() {
+func (b *Block) Print() {
 	fmt.Println("--------------------------------------------------------------------------------")
 
-	fmt.Printf("Hash:      %x\n", block.Hash)
-	fmt.Printf("Nonce:     %d\n", block.Nonce)
-	fmt.Printf("Prev hash: %x\n", block.PrevBlockHash)
+	fmt.Printf("Hash:      %x\n", b.Hash)
+	fmt.Printf("Nonce:     %d\n", b.Nonce)
+	fmt.Printf("Prev hash: %x\n", b.PrevBlockHash)
 	fmt.Println()
 
-	for index, tx := range block.Transactions {
+	for index, tx := range b.Transactions {
 		fmt.Printf("Transaction %d:\n", index)
 		tx.Print()
 	}
@@ -58,11 +59,11 @@ func (block *Block) Print() {
 }
 
 // 序列化区块。
-func (block *Block) Serialize() []byte {
+func (b *Block) Serialize() []byte {
 	var seq bytes.Buffer
 
 	encoder := gob.NewEncoder(&seq)
-	err := encoder.Encode(block)
+	err := encoder.Encode(b)
 	if err != nil {
 		panic(err)
 	}
