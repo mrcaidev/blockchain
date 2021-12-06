@@ -105,14 +105,15 @@ func (tx *Transaction) Verify(prevTXs map[string]*Transaction) bool {
 	// 检查各输入的ID是否正确。
 	for _, txi := range tx.Inputs {
 		if prevTXs[hex.EncodeToString(txi.RefID)].ID == nil {
-			panic("previous transaction incorrect")
+			panic("previous transaction id incorrect")
 		}
 	}
 
 	txCopy := tx.Deepcopy()
+	txCopy.Print()
 	curve := elliptic.P256()
 
-	for txiIndex, txi := range txCopy.Inputs {
+	for txiIndex, txi := range tx.Inputs {
 		prevTX := prevTXs[hex.EncodeToString(txi.RefID)]
 		txCopy.Inputs[txiIndex].Signature = nil
 		txCopy.Inputs[txiIndex].Pubkey = prevTX.Outputs[txi.RefIndex].PubkeyHash
