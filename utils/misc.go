@@ -14,7 +14,7 @@ func IsValidAddress(address string) bool {
 }
 
 // 检测文件是否存在。
-func HasFile(filename string) bool {
-	_, err := os.Stat(filename)
+func HasFile(filepath string) bool {
+	_, err := os.Stat(filepath)
 	return !os.IsNotExist(err)
 }

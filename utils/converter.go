@@ -7,7 +7,7 @@ import (
 )
 
 // int64 -> []byte
-func IntToBytes(data int64) []byte {
+func Int64ToBytes(data int64) []byte {
 	buffer := new(bytes.Buffer)
 	err := binary.Write(buffer, binary.BigEndian, data)
 	if err != nil {

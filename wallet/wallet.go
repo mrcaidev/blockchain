@@ -7,6 +7,9 @@ import (
 	"crypto/rand"
 )
 
+// 当前版本号。
+const version = byte(0x00)
+
 // 钱包结构。
 type Wallet struct {
 	PrivateKey ecdsa.PrivateKey // 私钥。
@@ -22,7 +25,7 @@ func NewWallet() *Wallet {
 // 获取钱包地址。
 func (wallet *Wallet) Address() string {
 	pubkeyHash := utils.GetPubkeyHash(wallet.PublicKey)
-	payloadWithVersion := append([]byte{utils.Version}, pubkeyHash...)
+	payloadWithVersion := append([]byte{version}, pubkeyHash...)
 	checksum := utils.GetChecksum(payloadWithVersion)
 	finalPayload := append(payloadWithVersion, checksum...)
 	return string(utils.Base58Encode(finalPayload))

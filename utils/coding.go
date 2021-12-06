@@ -10,9 +10,7 @@ import (
 
 // Base58 字母表。
 var alphabet = []byte("123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz")
-
-// Base58 基数。
-const base = 58
+var base = big.NewInt(58)
 
 // 校验和字节长度。
 const checksumLen = 4
@@ -21,12 +19,11 @@ const checksumLen = 4
 func Base58Encode(input []byte) []byte {
 	output := []byte{}
 	bigInput := BytesToBigInt(input)
-	bigBase := big.NewInt(int64(base))
 	bigZero := big.NewInt(0)
 	mod := big.NewInt(0)
 
 	for bigInput.Cmp(bigZero) != 0 {
-		bigInput.DivMod(bigInput, bigBase, mod)
+		bigInput.DivMod(bigInput, base, mod)
 		output = append(output, alphabet[mod.Int64()])
 	}
 
@@ -43,7 +40,7 @@ func Base58Encode(input []byte) []byte {
 
 // Base58 解码。
 func Base58Decode(input []byte) []byte {
-	output := big.NewInt(0)
+	result := big.NewInt(0)
 	zeroBytes := 0
 
 	for b := range input {
@@ -55,13 +52,13 @@ func Base58Decode(input []byte) []byte {
 	payload := input[zeroBytes:]
 	for _, b := range payload {
 		charIndex := bytes.IndexByte(alphabet, b)
-		output.Mul(output, big.NewInt(base))
-		output.Add(output, big.NewInt(int64(charIndex)))
+		result.Mul(result, base)
+		result.Add(result, big.NewInt(int64(charIndex)))
 	}
 
-	decoded := output.Bytes()
-	decoded = append(bytes.Repeat([]byte{byte(0x00)}, zeroBytes), decoded...)
-	return decoded
+	output := result.Bytes()
+	output = append(bytes.Repeat([]byte{byte(0x00)}, zeroBytes), output...)
+	return output
 }
 
 // 首尾翻转 []byte 类型的数据。

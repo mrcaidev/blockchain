@@ -41,11 +41,11 @@ func (block *Block) hashTX() []byte {
 func (proof *pow) hashBlock(nonce int) [32]byte {
 	blockBytes := bytes.Join(
 		[][]byte{
-			utils.IntToBytes(proof.block.Timestamp),
+			utils.Int64ToBytes(proof.block.Timestamp),
 			proof.block.hashTX(),
 			proof.block.PrevBlockHash,
-			utils.IntToBytes(int64(nonce)),
-			utils.IntToBytes(int64(difficulty)),
+			utils.Int64ToBytes(int64(nonce)),
+			utils.Int64ToBytes(int64(difficulty)),
 		},
 		[]byte{},
 	)
