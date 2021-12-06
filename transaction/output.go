@@ -11,15 +11,18 @@ type TXOutput struct {
 	PubkeyHash []byte // 公钥哈希值。
 }
 
-// 创建输出。
+// 创建交易输出。
 func NewTXO(value int, address string) *TXOutput {
-	hash := utils.Base58Decode([]byte(address))
-	hash = hash[1 : len(hash)-4]
-	txo := TXOutput{value, hash}
+	// 解析出传入地址中蕴含的公钥哈希。
+	payload := utils.Base58Decode([]byte(address))
+	pubkeyHash := payload[1 : len(payload)-utils.ChecksumLen]
+
+	txo := TXOutput{value, pubkeyHash}
 	return &txo
 }
 
-// 检验输出是否能被公钥解锁。
+// 检验交易输出是否能被指定公钥解锁。
+// 即：判断交易输出内的公钥，与传入的指定公钥，是不是同一把。
 func (txo *TXOutput) IsUnlockableWith(pubkeyHash []byte) bool {
 	return bytes.Equal(txo.PubkeyHash, pubkeyHash)
 }

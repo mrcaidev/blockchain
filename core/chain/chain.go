@@ -174,7 +174,7 @@ func (chain *Chain) FindUTX(pubkeyHash []byte) []*tx.Transaction {
 				// 遍历这笔交易的输入。
 				for _, txi := range TX.Inputs {
 					// 如果能解锁，说明这是被花费过的。
-					if txi.UsesKey(pubkeyHash) {
+					if txi.IsLockedWith(pubkeyHash) {
 						refID := hex.EncodeToString(txi.RefID)
 						stxoIndexes[refID] = append(stxoIndexes[refID], txi.RefIndex)
 					}
