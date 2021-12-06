@@ -14,7 +14,7 @@ func newChain(address string) {
 		panic("invalid address")
 	}
 	chain := chain.NewChain(address)
-	chain.CloseDatabase()
+	chain.Close()
 	fmt.Println("Created!")
 }
 
@@ -32,7 +32,7 @@ func balance(address string) {
 		panic("invalid address")
 	}
 	chain := chain.LoadChain()
-	defer chain.CloseDatabase()
+	defer chain.Close()
 
 	balance := 0
 	pubkeyHash := utils.Base58Decode([]byte(address))
@@ -62,7 +62,7 @@ func trade(from string, to string, amount int) {
 		panic("invalid address <to>")
 	}
 	chain := chain.LoadChain()
-	defer chain.CloseDatabase()
+	defer chain.Close()
 
 	TX := chain.NewUTXOTX(from, to, amount)
 	chain.AddBlock([]*tx.Transaction{TX})
@@ -72,7 +72,7 @@ func trade(from string, to string, amount int) {
 // 打印区块链。
 func print() {
 	chain := chain.LoadChain()
-	defer chain.CloseDatabase()
+	defer chain.Close()
 	iter := chain.Iterator()
 
 	for {

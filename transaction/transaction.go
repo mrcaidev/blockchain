@@ -54,7 +54,7 @@ func (tx *Transaction) noSigCopy() *Transaction {
 }
 
 // 对每笔交易输入签名。
-func (tx *Transaction) Sign(privkey ecdsa.PrivateKey, prevTXs map[string]*Transaction) {
+func (tx *Transaction) Sign(privkey ecdsa.PrivateKey, refTxs map[string]*Transaction) {
 	// 如果当前交易是 coinbase 交易，就不用签名。
 	if tx.IsCoinbase() {
 		return
@@ -62,7 +62,7 @@ func (tx *Transaction) Sign(privkey ecdsa.PrivateKey, prevTXs map[string]*Transa
 
 	// 检查交易输入所属的交易的 ID 是否正确。
 	for _, txi := range tx.Inputs {
-		if prevTXs[hex.EncodeToString(txi.RefID)].ID == nil {
+		if refTxs[hex.EncodeToString(txi.RefID)].ID == nil {
 			panic("previous transaction ID incorrect")
 		}
 	}
@@ -71,7 +71,7 @@ func (tx *Transaction) Sign(privkey ecdsa.PrivateKey, prevTXs map[string]*Transa
 	txCopy := tx.noSigCopy()
 	for txiIndex, txi := range txCopy.Inputs {
 		// 获取签名的对象。
-		prevTx := prevTXs[hex.EncodeToString(txi.RefID)]
+		prevTx := refTxs[hex.EncodeToString(txi.RefID)]
 		txCopy.Inputs[txiIndex].Signature = nil
 		txCopy.Inputs[txiIndex].Pubkey = prevTx.Outputs[txi.RefIndex].PubkeyHash
 		txCopy.ID = txCopy.Hash()
@@ -87,7 +87,7 @@ func (tx *Transaction) Sign(privkey ecdsa.PrivateKey, prevTXs map[string]*Transa
 }
 
 // 检验交易输入的签名。
-func (tx *Transaction) Verify(prevTXs map[string]*Transaction) bool {
+func (tx *Transaction) Verify(refTxs map[string]*Transaction) bool {
 	// 如果当前交易是 coinbase 交易，就不用验证。
 	if tx.IsCoinbase() {
 		return true
@@ -95,7 +95,7 @@ func (tx *Transaction) Verify(prevTXs map[string]*Transaction) bool {
 
 	// 检查交易输入所属的交易的 ID 是否正确。
 	for _, txi := range tx.Inputs {
-		if prevTXs[hex.EncodeToString(txi.RefID)].ID == nil {
+		if refTxs[hex.EncodeToString(txi.RefID)].ID == nil {
 			panic("previous transaction ID incorrect")
 		}
 	}
@@ -105,7 +105,7 @@ func (tx *Transaction) Verify(prevTXs map[string]*Transaction) bool {
 	curve := elliptic.P256()
 	for txiIndex, txi := range tx.Inputs {
 		// 获取与签名时相同的对象。
-		prevTX := prevTXs[hex.EncodeToString(txi.RefID)]
+		prevTX := refTxs[hex.EncodeToString(txi.RefID)]
 		txCopy.Inputs[txiIndex].Signature = nil
 		txCopy.Inputs[txiIndex].Pubkey = prevTX.Outputs[txi.RefIndex].PubkeyHash
 		txCopy.ID = txCopy.Hash()
