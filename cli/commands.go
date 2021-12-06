@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"blockchain/core"
+	"blockchain/core/chain"
 	tx "blockchain/transaction"
 	"blockchain/utils"
 	"blockchain/wallet"
@@ -11,9 +11,9 @@ import (
 // 创建新区块链。
 func newChain(address string) {
 	if !utils.IsValidAddress(address) {
-		panic("[Error] Invalid address!")
+		panic("invalid address")
 	}
-	chain := core.NewBlockChain(address)
+	chain := chain.NewChain(address)
 	chain.CloseDatabase()
 	fmt.Println("Created!")
 }
@@ -27,11 +27,11 @@ func newWallet() {
 }
 
 // 查询余额。
-func queryBalance(address string) {
+func balance(address string) {
 	if !utils.IsValidAddress(address) {
-		panic("[Error] Invalid address!")
+		panic("invalid address")
 	}
-	chain := core.LoadBlockChain()
+	chain := chain.LoadChain()
 	defer chain.CloseDatabase()
 
 	balance := 0
@@ -46,7 +46,7 @@ func queryBalance(address string) {
 }
 
 // 列出地址列表。
-func listAddresses() {
+func list() {
 	wallets := wallet.NewWallets()
 	for index, addr := range wallets.Addresses() {
 		fmt.Printf("Address %d: %s\n", index, addr)
@@ -54,14 +54,14 @@ func listAddresses() {
 }
 
 // 发送币。
-func send(from string, to string, amount int) {
+func trade(from string, to string, amount int) {
 	if !utils.IsValidAddress(from) {
-		panic("[Error] Invalid <from>!")
+		panic("invalid address <from>")
 	}
 	if !utils.IsValidAddress(to) {
-		panic("[Error] Invalid <to>!")
+		panic("invalid address <to>")
 	}
-	chain := core.LoadBlockChain()
+	chain := chain.LoadChain()
 	defer chain.CloseDatabase()
 
 	TX := chain.NewUTXOTX(from, to, amount)
@@ -71,7 +71,7 @@ func send(from string, to string, amount int) {
 
 // 打印区块链。
 func print() {
-	chain := core.LoadBlockChain()
+	chain := chain.LoadChain()
 	defer chain.CloseDatabase()
 	iter := chain.Iterator()
 
@@ -85,11 +85,13 @@ func print() {
 }
 
 // 帮助。
-func showHelp() {
+func help() {
 	fmt.Println("Usage:")
-	fmt.Println("  new        -address <address>                        Create a new blockchain and reward subsidy to <address>.")
+	fmt.Println("  chain      -address <address>                        Create a new blockchain and reward subsidy to <address>.")
+	fmt.Println("  wallet     -address <address>                        Create a new wallet at <address>.")
+	fmt.Println("  list                                                 List the addresses of all wallets.")
 	fmt.Println("  balance    -address <address>                        Query balance of <address> stored in the blockchain.")
-	fmt.Println("  send       -from <from> -to <to> -amount <amount>    Send <amount> of coins from <from> to <to>.")
+	fmt.Println("  trade      -from <from> -to <to> -amount <amount>    Send <amount> of coins from <from> to <to>.")
 	fmt.Println("  print                                                Print blocks info of the blockchain.")
 	fmt.Println("  help                                                 Show help for commands.")
 }

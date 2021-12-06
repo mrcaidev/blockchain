@@ -45,14 +45,13 @@ func Run() {
 		err = listCmd.Parse(os.Args[2:])
 	case "balance":
 		err = balanceCmd.Parse(os.Args[2:])
-	case "send":
+	case "trade":
 		err = tradeCmd.Parse(os.Args[2:])
 	case "print":
 		err = printCmd.Parse(os.Args[2:])
 	case "help":
 		err = helpCmd.Parse(os.Args[2:])
 	default:
-		showHelp()
 		err = errors.New("command not supported! Use command `help` to check out usage")
 	}
 	if err != nil {
@@ -70,14 +69,14 @@ func Run() {
 		newWallet()
 
 	} else if listCmd.Parsed() {
-		listAddresses()
+		list()
 
 	} else if balanceCmd.Parsed() {
 		if *balanceAddr == "" {
 			balanceCmd.Usage()
 			os.Exit(1)
 		}
-		queryBalance(*balanceAddr)
+		balance(*balanceAddr)
 
 	} else if tradeCmd.Parsed() {
 		amount, err := strconv.Atoi(*tradeAmount)
@@ -89,12 +88,12 @@ func Run() {
 			tradeCmd.Usage()
 			os.Exit(1)
 		}
-		send(*tradeFrom, *tradeTo, amount)
+		trade(*tradeFrom, *tradeTo, amount)
 
 	} else if printCmd.Parsed() {
 		print()
 
 	} else if helpCmd.Parsed() {
-		showHelp()
+		help()
 	}
 }
