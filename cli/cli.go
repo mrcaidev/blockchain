@@ -11,27 +11,27 @@ import (
 func Run() {
 	// 验证是否给出命令。
 	if len(os.Args) < 2 {
-		panic("[Error] Command not given! Use command `help` to check out usage.")
+		panic("use command `help` to check out usage")
 	}
 
-	// 区块链创建。
-	chainCmd := flag.NewFlagSet("chain", flag.ExitOnError)
-	chainAddr := chainCmd.String("address", "", "The address who mined out genesis block.")
 	// 钱包创建。
 	walletCmd := flag.NewFlagSet("wallet", flag.ExitOnError)
-	// 地址展示。
+	// 列出地址。
 	listCmd := flag.NewFlagSet("list", flag.ExitOnError)
-	// 余额查询。
+	// 创建区块链。
+	chainCmd := flag.NewFlagSet("chain", flag.ExitOnError)
+	chainAddr := chainCmd.String("address", "", "The address who mined out genesis block.")
+	// 查询余额。
 	balanceCmd := flag.NewFlagSet("balance", flag.ExitOnError)
 	balanceAddr := balanceCmd.String("address", "", "The address being queried.")
-	// 交易。
+	// 发起交易。
 	tradeCmd := flag.NewFlagSet("trade", flag.ExitOnError)
 	tradeFrom := tradeCmd.String("from", "", "Source wallet address.")
 	tradeTo := tradeCmd.String("to", "", "Destination wallet address.")
 	tradeAmount := tradeCmd.String("amount", "0", "Amount of coins to trade.")
-	// 区块链打印。
+	// 打印区块链。
 	printCmd := flag.NewFlagSet("print", flag.ExitOnError)
-	// 帮助信息。
+	// 显示帮助。
 	helpCmd := flag.NewFlagSet("help", flag.ExitOnError)
 
 	// 解析命令行参数。
@@ -52,7 +52,7 @@ func Run() {
 	case "help":
 		err = helpCmd.Parse(os.Args[2:])
 	default:
-		err = errors.New("command not supported! Use command `help` to check out usage")
+		err = errors.New("command not supported")
 	}
 	if err != nil {
 		panic(err)
@@ -61,39 +61,38 @@ func Run() {
 	if chainCmd.Parsed() {
 		if *chainAddr == "" {
 			chainCmd.Usage()
-			os.Exit(1)
+		} else {
+			newChain(*chainAddr)
 		}
-		newChain(*chainAddr)
 
 	} else if walletCmd.Parsed() {
 		newWallet()
 
 	} else if listCmd.Parsed() {
-		list()
+		listAddresses()
 
 	} else if balanceCmd.Parsed() {
 		if *balanceAddr == "" {
 			balanceCmd.Usage()
 			os.Exit(1)
+		} else {
+			queryBalance(*balanceAddr)
 		}
-		balance(*balanceAddr)
 
 	} else if tradeCmd.Parsed() {
 		amount, err := strconv.Atoi(*tradeAmount)
 		if err != nil {
 			tradeCmd.Usage()
-			os.Exit(1)
-		}
-		if *tradeFrom == "" || *tradeTo == "" || amount <= 0 {
+		} else if *tradeFrom == "" || *tradeTo == "" || amount <= 0 {
 			tradeCmd.Usage()
-			os.Exit(1)
+		} else {
+			startTrade(*tradeFrom, *tradeTo, amount)
 		}
-		trade(*tradeFrom, *tradeTo, amount)
 
 	} else if printCmd.Parsed() {
-		print()
+		printChain()
 
 	} else if helpCmd.Parsed() {
-		help()
+		showHelp()
 	}
 }

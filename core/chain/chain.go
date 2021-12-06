@@ -282,3 +282,21 @@ func (c *Chain) VerifyTX(tx *transaction.Transaction) bool {
 	}
 	return tx.Verify(refTxs)
 }
+
+// 获得区块链属于某地址的余额。
+func (c *Chain) GetBalance(address string) int {
+	// 获得地址内蕴含的公钥哈希。
+	pubkeyHash := utils.Base58Decode([]byte(address))
+	pubkeyHash = pubkeyHash[1 : len(pubkeyHash)-4]
+
+	// 使用该公钥哈希，寻找每一笔未消费的输出。
+	UTXOs := c.FindUTXO(pubkeyHash)
+
+	// 累加这些输出内的余额。
+	balance := 0
+	for _, utxo := range UTXOs {
+		balance += utxo.Value
+	}
+
+	return balance
+}

@@ -2,96 +2,90 @@ package cli
 
 import (
 	"blockchain/core/chain"
-	tx "blockchain/transaction"
+	"blockchain/transaction"
 	"blockchain/utils"
 	"blockchain/wallet"
 	"fmt"
 )
 
-// 创建新区块链。
-func newChain(address string) {
-	if !utils.IsValidAddress(address) {
-		panic("invalid address")
-	}
-	chain := chain.NewChain(address)
-	chain.Close()
-	fmt.Println("Created!")
-}
-
-// 创建新钱包。
+// 创建钱包。
 func newWallet() {
 	wallets := wallet.LoadWallets()
 	address := wallets.AddWallet()
 	wallets.Persist()
-	fmt.Printf("New address: %s\n", address)
+
+	fmt.Printf("New wallet address: %s\n", address)
 }
 
-// 查询余额。
-func balance(address string) {
+// 列出地址。
+func listAddresses() {
+	wallets := wallet.LoadWallets()
+
+	for index, address := range wallets.Addresses() {
+		fmt.Printf("Address %d: %s\n", index, address)
+	}
+}
+
+// 创建区块链。
+func newChain(address string) {
 	if !utils.IsValidAddress(address) {
 		panic("invalid address")
 	}
+
+	chain := chain.NewChain(address)
+	chain.Close()
+
+	fmt.Println("New chain created.")
+}
+
+// 查询余额。
+func queryBalance(address string) {
+	if !utils.IsValidAddress(address) {
+		panic("invalid address")
+	}
+
 	chain := chain.LoadChain()
 	defer chain.Close()
 
-	balance := 0
-	pubkeyHash := utils.Base58Decode([]byte(address))
-	pubkeyHash = pubkeyHash[1 : len(pubkeyHash)-4]
-	UTXOs := chain.FindUTXO(pubkeyHash)
+	balance := chain.GetBalance(address)
 
-	for _, utxo := range UTXOs {
-		balance += utxo.Value
-	}
 	fmt.Printf("Balance of %s: %d\n", address, balance)
 }
 
-// 列出地址列表。
-func list() {
-	wallets := wallet.LoadWallets()
-	for index, addr := range wallets.Addresses() {
-		fmt.Printf("Address %d: %s\n", index, addr)
-	}
-}
-
-// 发送币。
-func trade(from string, to string, amount int) {
+// 发起交易。
+func startTrade(from string, to string, amount int) {
 	if !utils.IsValidAddress(from) {
 		panic("invalid address <from>")
 	}
 	if !utils.IsValidAddress(to) {
 		panic("invalid address <to>")
 	}
+
 	chain := chain.LoadChain()
 	defer chain.Close()
 
-	TX := chain.NewUTXOTX(from, to, amount)
-	chain.AddBlock([]*tx.Transaction{TX})
-	fmt.Println("Success!")
+	tx := chain.NewUTXOTX(from, to, amount)
+	chain.AddBlock([]*transaction.Transaction{tx})
+
+	fmt.Println("Trade completed.")
 }
 
 // 打印区块链。
-func print() {
+func printChain() {
 	chain := chain.LoadChain()
 	defer chain.Close()
-	iter := chain.Iterator()
 
-	for {
-		block := iter.Next()
-		block.Print()
-		if len(block.PrevBlockHash) == 0 {
-			break
-		}
-	}
+	chain.Print()
 }
 
-// 帮助。
-func help() {
+// 显示帮助。
+func showHelp() {
 	fmt.Println("Usage:")
-	fmt.Println("  chain      -address <address>                        Create a new blockchain and reward subsidy to <address>.")
-	fmt.Println("  wallet     -address <address>                        Create a new wallet at <address>.")
+	fmt.Println("  wallet                                               Create a new wallet.")
 	fmt.Println("  list                                                 List the addresses of all wallets.")
-	fmt.Println("  balance    -address <address>                        Query balance of <address> stored in the blockchain.")
-	fmt.Println("  trade      -from <from> -to <to> -amount <amount>    Send <amount> of coins from <from> to <to>.")
-	fmt.Println("  print                                                Print blocks info of the blockchain.")
-	fmt.Println("  help                                                 Show help for commands.")
+	fmt.Println("  chain      -address <address>                        Create a new blockchain mined out by <address>.")
+	fmt.Println("  balance    -address <address>                        Query balance of <address>.")
+	fmt.Println("  trade      -from <from> -to <to> -amount <amount>    Trade <amount> of coins from <from> to <to>.")
+	fmt.Println("  print                                                Print blockchain information.")
+	fmt.Println("  help                                                 Show help of commands.")
 }
