@@ -6,12 +6,12 @@ import (
 )
 
 // 交易输出集结构。
-type TXOutputs struct {
-	Outputs []*TXOutput // 交易输出集。
+type TxOutputs struct {
+	List []*TxOutput // 交易输出列表。
 }
 
 // 序列化交易输出集。
-func (txos TXOutputs) Serialize() []byte {
+func (txos *TxOutputs) Serialize() []byte {
 	var buffer bytes.Buffer
 
 	encoder := gob.NewEncoder(&buffer)
@@ -24,8 +24,8 @@ func (txos TXOutputs) Serialize() []byte {
 }
 
 // 反序列化交易输出集。
-func DeserializeTXOutputs(data []byte) TXOutputs {
-	var txos TXOutputs
+func DeserializeTxOutputs(data []byte) *TxOutputs {
+	var txos TxOutputs
 
 	decoder := gob.NewDecoder(bytes.NewReader(data))
 	err := decoder.Decode(&txos)
@@ -33,5 +33,5 @@ func DeserializeTXOutputs(data []byte) TXOutputs {
 		panic(err)
 	}
 
-	return txos
+	return &txos
 }

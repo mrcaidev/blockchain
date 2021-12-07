@@ -2,15 +2,15 @@ package blockchain
 
 import (
 	"blockchain/core/block"
+	"blockchain/core/transaction"
 	"blockchain/utils"
-
-	"blockchain/transaction"
+	"os"
 
 	"github.com/boltdb/bolt"
 )
 
 // 数据库。
-const dbPath = "blockchain.db"
+const chainDbPath = "blockchain.db"
 const blocksBucket = "blocks"
 const lastHashKey = "l"
 
@@ -26,18 +26,18 @@ type Chain struct {
 // 创建区块链。
 func NewChain(address string) *Chain {
 	// 如果数据库已经存在，就报错退出。
-	if utils.HasFile(dbPath) {
+	if !chainDbNotExists() {
 		panic("blockchain already exists")
 	}
 
 	// 打开数据库。
-	db, err := bolt.Open(dbPath, 0600, nil)
+	db, err := bolt.Open(chainDbPath, 0600, nil)
 	if err != nil {
 		panic(err)
 	}
 
 	// 创建 coinbase 交易和相应的创世块。
-	coinbaseTx := NewCoinbaseTX(address, genesisCoinbase)
+	coinbaseTx := NewCoinbaseTx(address, genesisCoinbase)
 	genesisBlock := block.NewGenesisBlock(coinbaseTx)
 	rear := genesisBlock.Hash
 
@@ -69,12 +69,12 @@ func NewChain(address string) *Chain {
 // 读取区块链。
 func LoadChain() *Chain {
 	// 如果数据库不存在，就报错退出。
-	if !utils.HasFile(dbPath) {
+	if chainDbNotExists() {
 		panic("blockchain not found")
 	}
 
 	// 打开数据库。
-	db, err := bolt.Open(dbPath, 0600, nil)
+	db, err := bolt.Open(chainDbPath, 0600, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -173,4 +173,10 @@ func (c *Chain) GetBalance(address string) int {
 	}
 
 	return balance
+}
+
+// 判断区块链数据库是否存在。
+func chainDbNotExists() bool {
+	_, err := os.Stat(chainDbPath)
+	return os.IsNotExist(err)
 }

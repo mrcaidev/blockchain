@@ -2,19 +2,29 @@ package cli
 
 import (
 	"blockchain/core/blockchain"
-	"blockchain/transaction"
+	"blockchain/core/transaction"
+	"blockchain/core/wallet"
 	"blockchain/utils"
-	"blockchain/wallet"
+	"bytes"
 	"fmt"
 )
+
+// 判断是否是有效地址。
+func isValidAddress(address string) bool {
+	pubkeyHash := utils.Base58Decode([]byte(address))
+	actualChecksum := pubkeyHash[len(pubkeyHash)-utils.ChecksumLen:]
+	supposedChecksum := utils.GetChecksum(pubkeyHash[:len(pubkeyHash)-utils.ChecksumLen])
+	return bytes.Equal(actualChecksum, supposedChecksum)
+}
 
 // 创建钱包。
 func newWallet() {
 	wallets := wallet.LoadWallets()
+
 	address := wallets.AddWallet()
 	wallets.Persist()
 
-	fmt.Printf("New wallet address: %s\n", address)
+	fmt.Printf("New wallet created: %s\n", address)
 }
 
 // 列出地址。
@@ -22,18 +32,19 @@ func listAddresses() {
 	wallets := wallet.LoadWallets()
 
 	for index, address := range wallets.Addresses() {
-		fmt.Printf("Address %d: %s\n", index, address)
+		fmt.Printf("Wallet %d address: %s\n", index, address)
 	}
 }
 
 // 创建区块链。
 func newChain(address string) {
-	if !utils.IsValidAddress(address) {
+	if !isValidAddress(address) {
 		panic("invalid address")
 	}
 
 	chain := blockchain.NewChain(address)
 	defer chain.Close()
+
 	chain.Reindex()
 
 	fmt.Println("New chain created.")
@@ -41,7 +52,7 @@ func newChain(address string) {
 
 // 查询余额。
 func queryBalance(address string) {
-	if !utils.IsValidAddress(address) {
+	if !isValidAddress(address) {
 		panic("invalid address")
 	}
 
@@ -55,18 +66,21 @@ func queryBalance(address string) {
 
 // 发起交易。
 func startTrade(from string, to string, amount int) {
-	if !utils.IsValidAddress(from) {
+	if !isValidAddress(from) {
 		panic("invalid address <from>")
 	}
-	if !utils.IsValidAddress(to) {
+	if !isValidAddress(to) {
 		panic("invalid address <to>")
+	}
+	if from == to {
+		panic("invalid trade cycle")
 	}
 
 	chain := blockchain.LoadChain()
 	defer chain.Close()
 
-	tx := chain.NewUTXOTX(from, to, amount)
-	coinbaseTx := blockchain.NewCoinbaseTX(from, "")
+	tx := chain.NewUtxoTx(from, to, amount)
+	coinbaseTx := blockchain.NewCoinbaseTx(from, "")
 	chain.AddBlock([]*transaction.Transaction{coinbaseTx, tx})
 
 	fmt.Println("Trade completed.")
@@ -79,7 +93,8 @@ func reindexChain() {
 
 	chain.Reindex()
 	cnt := chain.CountTx()
-	fmt.Printf("Completed. %d transactions in chain now.", cnt)
+
+	fmt.Printf("Reindex completed: %d transactions in chain.", cnt)
 }
 
 // 打印区块链。
@@ -98,6 +113,7 @@ func showHelp() {
 	fmt.Println("  chain      -address <address>                        Create a new blockchain mined out by <address>.")
 	fmt.Println("  balance    -address <address>                        Query balance of <address>.")
 	fmt.Println("  trade      -from <from> -to <to> -amount <amount>    Trade <amount> of coins from <from> to <to>.")
+	fmt.Println("  reindex                                              Reindex the transactions in chain.")
 	fmt.Println("  print                                                Print blockchain information.")
 	fmt.Println("  help                                                 Show help of commands.")
 }

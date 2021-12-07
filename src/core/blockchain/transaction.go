@@ -2,7 +2,7 @@ package blockchain
 
 import (
 	"blockchain/core/block"
-	"blockchain/transaction"
+	"blockchain/core/transaction"
 	"bytes"
 	"crypto/ecdsa"
 	"encoding/hex"
@@ -34,8 +34,8 @@ func (c *Chain) FindTx(ID []byte) *transaction.Transaction {
 }
 
 // 找到所有未消费的交易输出。
-func (c *Chain) FindUtxos() map[string]transaction.TXOutputs {
-	utxos := make(map[string]transaction.TXOutputs)
+func (c *Chain) FindUtxos() map[string]transaction.TxOutputs {
+	utxos := make(map[string]transaction.TxOutputs)
 	stxoIndexes := make(map[string][]int)
 
 	// 遍历区块链中的每一个区块。
@@ -56,7 +56,7 @@ func (c *Chain) FindUtxos() map[string]transaction.TXOutputs {
 					}
 				} else {
 					utxo := utxos[txID]
-					utxo.Outputs = append(utxo.Outputs, txo)
+					utxo.List = append(utxo.List, txo)
 					utxos[txID] = utxo
 				}
 			}
@@ -77,17 +77,17 @@ func (c *Chain) FindUtxos() map[string]transaction.TXOutputs {
 }
 
 // 找到指定公钥可解锁的未消费交易输出。
-func (c *Chain) FindPayableUtxos(pubkeyHash []byte) []*transaction.TXOutput {
-	var utxos []*transaction.TXOutput
+func (c *Chain) FindPayableUtxos(pubkeyHash []byte) []*transaction.TxOutput {
+	var utxos []*transaction.TxOutput
 
 	err := c.db.View(func(t *bolt.Tx) error {
 		bucket := t.Bucket([]byte(utxoBucket))
 		cursor := bucket.Cursor()
 
 		for key, value := cursor.First(); key != nil; key, value = cursor.Next() {
-			txos := transaction.DeserializeTXOutputs(value)
+			txos := transaction.DeserializeTxOutputs(value)
 
-			for _, txo := range txos.Outputs {
+			for _, txo := range txos.List {
 				if txo.IsUnlockableWith(pubkeyHash) {
 					utxos = append(utxos, txo)
 				}
@@ -113,9 +113,9 @@ func (c *Chain) FindUtxosToPay(pubkeyHash []byte, amount int) (int, map[string][
 
 		for key, value := cursor.First(); key != nil; key, value = cursor.Next() {
 			txID := hex.EncodeToString(key)
-			txos := transaction.DeserializeTXOutputs(value)
+			txos := transaction.DeserializeTxOutputs(value)
 
-			for txoIndex, txo := range txos.Outputs {
+			for txoIndex, txo := range txos.List {
 				if txo.IsUnlockableWith(pubkeyHash) {
 					atHand += txo.Value
 					utxoToPay[txID] = append(utxoToPay[txID], txoIndex)
@@ -178,6 +178,7 @@ func (c *Chain) CountTx() int {
 	return cnt
 }
 
+// 重新索引区块链内的交易。
 func (c *Chain) Reindex() {
 	bucketName := []byte(utxoBucket)
 
@@ -225,6 +226,7 @@ func (c *Chain) Reindex() {
 	}
 }
 
+// 更新数据库。
 func (c *Chain) Update(block *block.Block) {
 	err := c.db.Update(func(t *bolt.Tx) error {
 		bucket := t.Bucket([]byte(utxoBucket))
@@ -232,17 +234,17 @@ func (c *Chain) Update(block *block.Block) {
 		for _, tx := range block.Transactions {
 			if !tx.IsCoinbase() {
 				for _, txi := range tx.Inputs {
-					updatedTxos := transaction.TXOutputs{}
+					updatedTxos := transaction.TxOutputs{}
 					txosBytes := bucket.Get(txi.RefID)
-					txos := transaction.DeserializeTXOutputs(txosBytes)
+					txos := transaction.DeserializeTxOutputs(txosBytes)
 
-					for txoIndex, txo := range txos.Outputs {
+					for txoIndex, txo := range txos.List {
 						if txoIndex != txi.RefIndex {
-							updatedTxos.Outputs = append(updatedTxos.Outputs, txo)
+							updatedTxos.List = append(updatedTxos.List, txo)
 						}
 					}
 
-					if len(updatedTxos.Outputs) == 0 {
+					if len(updatedTxos.List) == 0 {
 						err := bucket.Delete(txi.RefID)
 						if err != nil {
 							return err
@@ -256,8 +258,8 @@ func (c *Chain) Update(block *block.Block) {
 				}
 			}
 
-			newTxos := transaction.TXOutputs{}
-			newTxos.Outputs = append(newTxos.Outputs, tx.Outputs...)
+			newTxos := transaction.TxOutputs{}
+			newTxos.List = append(newTxos.List, tx.Outputs...)
 
 			err := bucket.Put(tx.ID, newTxos.Serialize())
 			if err != nil {

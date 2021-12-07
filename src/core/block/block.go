@@ -6,16 +6,16 @@ import (
 	"fmt"
 	"time"
 
-	"blockchain/transaction"
+	"blockchain/core/transaction"
 )
 
 // 区块结构。
 type Block struct {
-	Timestamp     int64                      // 区块时间戳。
+	Timestamp     int64                      // 时间戳。
 	Transactions  []*transaction.Transaction // 交易列表。
-	PrevBlockHash []byte                     // 前一区块摘要值。
-	Hash          []byte                     // 区块标识。
-	Nonce         int                        // 区块随机数。
+	PrevBlockHash []byte                     // 前一区块哈希值。
+	Hash          []byte                     // 本区块哈希值。
+	Nonce         int                        // 随机数。
 }
 
 // 创建区块。
@@ -28,10 +28,8 @@ func NewBlock(txs []*transaction.Transaction, prevBlockHash []byte) *Block {
 		Nonce:         0,
 	}
 
-	// 证明工作量。
 	fmt.Println("Mining new block...")
-	pow := newPow(block)
-	pow.Run()
+	block.proofWork()
 
 	return block
 }
@@ -48,10 +46,9 @@ func (b *Block) Print() {
 	fmt.Printf("Hash:      %x\n", b.Hash)
 	fmt.Printf("Nonce:     %d\n", b.Nonce)
 	fmt.Printf("Prev hash: %x\n", b.PrevBlockHash)
-	fmt.Println()
 
 	for index, tx := range b.Transactions {
-		fmt.Printf("Transaction %d:\n", index)
+		fmt.Printf("\nTransaction %d:\n", index)
 		tx.Print()
 	}
 

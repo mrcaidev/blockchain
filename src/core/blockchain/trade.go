@@ -1,36 +1,36 @@
 package blockchain
 
 import (
-	"blockchain/transaction"
+	"blockchain/core/transaction"
+	"blockchain/core/wallet"
 	"blockchain/utils"
-	"blockchain/wallet"
 	"encoding/hex"
 	"fmt"
 )
 
 // 创建一笔 coinbase 交易。
-func NewCoinbaseTX(to string, data string) *transaction.Transaction {
+func NewCoinbaseTx(to string, data string) *transaction.Transaction {
 	if data == "" {
 		data = fmt.Sprintf("Reward to '%s'", to)
 	}
 
 	// 创建交易的输入和输出。
-	txi := transaction.NewTXI([]byte{}, -1, nil, []byte(data))
-	txo := transaction.NewTXO(subsidy, to)
+	txi := transaction.NewTxi([]byte{}, -1, nil, []byte(data))
+	txo := transaction.NewTxo(subsidy, to)
 	tx := transaction.Transaction{
 		ID:      nil,
-		Inputs:  []*transaction.TXInput{txi},
-		Outputs: []*transaction.TXOutput{txo},
+		Inputs:  []*transaction.TxInput{txi},
+		Outputs: []*transaction.TxOutput{txo},
 	}
 	tx.ID = tx.Hash()
 	return &tx
 }
 
 // 创建一笔 UTXO 交易。
-func (c *Chain) NewUTXOTX(from string, to string, amount int) *transaction.Transaction {
+func (c *Chain) NewUtxoTx(from string, to string, amount int) *transaction.Transaction {
 	var (
-		newInputs  []*transaction.TXInput
-		newOutputs []*transaction.TXOutput
+		newInputs  []*transaction.TxInput
+		newOutputs []*transaction.TxOutput
 	)
 
 	// 获取发起方的钱包。
@@ -53,16 +53,16 @@ func (c *Chain) NewUTXOTX(from string, to string, amount int) *transaction.Trans
 			panic(err)
 		}
 		for _, index := range indexes {
-			newInputs = append(newInputs, transaction.NewTXI(txID, index, nil, wallet.Pubkey))
+			newInputs = append(newInputs, transaction.NewTxi(txID, index, nil, wallet.Pubkey))
 		}
 	}
 
 	// 创建交易输出。
-	newOutputs = append(newOutputs, transaction.NewTXO(amount, to))
+	newOutputs = append(newOutputs, transaction.NewTxo(amount, to))
 
 	// 如果需要找零，就多加一笔记录。
 	if deposit > amount {
-		newOutputs = append(newOutputs, transaction.NewTXO(deposit-amount, from))
+		newOutputs = append(newOutputs, transaction.NewTxo(deposit-amount, from))
 	}
 
 	// 将输入、输出存储进该次交易内。

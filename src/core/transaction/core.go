@@ -15,8 +15,8 @@ import (
 // 交易结构。
 type Transaction struct {
 	ID      []byte      // 该笔交易的ID。
-	Inputs  []*TXInput  // 该笔交易的输入。
-	Outputs []*TXOutput // 该笔交易的输出。
+	Inputs  []*TxInput  // 该笔交易的输入。
+	Outputs []*TxOutput // 该笔交易的输出。
 }
 
 // 判断交易是否为 coinbase 交易。
@@ -28,7 +28,7 @@ func (tx *Transaction) IsCoinbase() bool {
 	return len(tx.Inputs) == 1 && len(tx.Inputs[0].RefID) == 0 && tx.Inputs[0].RefIndex == -1
 }
 
-// 哈希化交易。
+// 获取交易的哈希值。
 func (tx *Transaction) Hash() []byte {
 	txCopy := *tx
 	txCopy.ID = []byte{}
@@ -39,16 +39,16 @@ func (tx *Transaction) Hash() []byte {
 // 创建交易的无签名副本。
 func (tx *Transaction) noSigCopy() *Transaction {
 	var (
-		txiCopy []*TXInput
-		txoCopy []*TXOutput
+		txiCopy []*TxInput
+		txoCopy []*TxOutput
 	)
 	// 拷贝输入。
 	for _, txi := range tx.Inputs {
-		txiCopy = append(txiCopy, &TXInput{txi.RefID, txi.RefIndex, nil, nil})
+		txiCopy = append(txiCopy, &TxInput{txi.RefID, txi.RefIndex, nil, nil})
 	}
 	// 拷贝输出。
 	for _, txo := range tx.Outputs {
-		txoCopy = append(txoCopy, &TXOutput{txo.Value, txo.PubkeyHash})
+		txoCopy = append(txoCopy, &TxOutput{txo.Value, txo.PubkeyHash})
 	}
 	return &Transaction{tx.ID, txiCopy, txoCopy}
 }
@@ -86,7 +86,7 @@ func (tx *Transaction) Sign(privkey ecdsa.PrivateKey, refTxs map[string]*Transac
 	}
 }
 
-// 检验交易输入的签名。
+// 验证交易输入的签名。
 func (tx *Transaction) Verify(refTxs map[string]*Transaction) bool {
 	// 如果当前交易是 coinbase 交易，就不用验证。
 	if tx.IsCoinbase() {
@@ -131,7 +131,7 @@ func (tx *Transaction) Verify(refTxs map[string]*Transaction) bool {
 
 // 打印交易信息。
 func (tx *Transaction) Print() {
-	fmt.Printf("\n  ID: %x\n", tx.ID)
+	fmt.Printf("  ID: %x\n", tx.ID)
 	for txiIndex, txi := range tx.Inputs {
 		fmt.Printf("  Input %d:\n", txiIndex)
 		fmt.Printf("    RefID:        %x\n", txi.RefID)

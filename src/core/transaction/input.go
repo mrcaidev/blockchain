@@ -6,7 +6,7 @@ import (
 )
 
 // 交易输入结构。
-type TXInput struct {
+type TxInput struct {
 	RefID     []byte // 引用输出所属交易的 ID。
 	RefIndex  int    // 引用输出在上一笔交易所有输出中的索引。
 	Signature []byte // 发起者的数字签名。
@@ -14,8 +14,8 @@ type TXInput struct {
 }
 
 // 创建交易输入。
-func NewTXI(refID []byte, refIndex int, signature []byte, pubkey []byte) *TXInput {
-	return &TXInput{
+func NewTxi(refID []byte, refIndex int, signature []byte, pubkey []byte) *TxInput {
+	return &TxInput{
 		RefID:     refID,
 		RefIndex:  refIndex,
 		Signature: signature,
@@ -25,7 +25,7 @@ func NewTXI(refID []byte, refIndex int, signature []byte, pubkey []byte) *TXInpu
 
 // 检验交易输入是否被指定公钥锁定。
 // 即：判断交易输入内的公钥，与传入的指定公钥，是不是同一把。
-func (txi *TXInput) IsLockedWith(pubkeyHash []byte) bool {
+func (txi *TxInput) IsLockedWith(pubkeyHash []byte) bool {
 	lockingHash := utils.GetPubkeyHash(txi.Pubkey)
 	return bytes.Equal(lockingHash, pubkeyHash)
 }

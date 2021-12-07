@@ -23,7 +23,7 @@ func Run() {
 	chainAddr := chainCmd.String("address", "", "The address who mined out genesis block.")
 	// 查询余额。
 	balanceCmd := flag.NewFlagSet("balance", flag.ExitOnError)
-	balanceAddr := balanceCmd.String("address", "", "The address being queried.")
+	balanceAddr := balanceCmd.String("address", "", "The address whose balance is being queried.")
 	// 发起交易。
 	tradeCmd := flag.NewFlagSet("trade", flag.ExitOnError)
 	tradeFrom := tradeCmd.String("from", "", "Source wallet address.")
@@ -62,6 +62,7 @@ func Run() {
 		panic(err)
 	}
 
+	// 根据解析到的命令进行动作。
 	if chainCmd.Parsed() {
 		if *chainAddr == "" {
 			chainCmd.Usage()
@@ -78,16 +79,13 @@ func Run() {
 	} else if balanceCmd.Parsed() {
 		if *balanceAddr == "" {
 			balanceCmd.Usage()
-			os.Exit(1)
 		} else {
 			queryBalance(*balanceAddr)
 		}
 
 	} else if tradeCmd.Parsed() {
 		amount, err := strconv.Atoi(*tradeAmount)
-		if err != nil {
-			tradeCmd.Usage()
-		} else if *tradeFrom == "" || *tradeTo == "" || amount <= 0 {
+		if err != nil || *tradeFrom == "" || *tradeTo == "" || amount <= 0 {
 			tradeCmd.Usage()
 		} else {
 			startTrade(*tradeFrom, *tradeTo, amount)
