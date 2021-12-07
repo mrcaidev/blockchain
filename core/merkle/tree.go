@@ -1,9 +1,11 @@
 package merkle
 
+// Merkle 树结构。
 type merkleTree struct {
-	Root *merkleNode
+	Root *merkleNode // 根结点。
 }
 
+// 创建 Merkle 树。
 func NewMerkleTree(dataList [][]byte) *merkleTree {
 	var baseNodes []merkleNode
 
