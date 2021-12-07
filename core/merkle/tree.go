@@ -1,7 +1,7 @@
 package merkle
 
 type merkleTree struct {
-	root *merkleNode
+	Root *merkleNode
 }
 
 func NewMerkleTree(dataList [][]byte) *merkleTree {

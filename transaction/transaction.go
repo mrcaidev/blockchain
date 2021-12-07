@@ -32,7 +32,7 @@ func (tx *Transaction) IsCoinbase() bool {
 func (tx *Transaction) Hash() []byte {
 	txCopy := *tx
 	txCopy.ID = []byte{}
-	hash := sha256.Sum256(txCopy.serialize())
+	hash := sha256.Sum256(txCopy.Serialize())
 	return hash[:]
 }
 
@@ -145,7 +145,7 @@ func (tx *Transaction) Print() {
 }
 
 // 序列化交易。
-func (tx *Transaction) serialize() []byte {
+func (tx *Transaction) Serialize() []byte {
 	var buffer bytes.Buffer
 
 	encoder := gob.NewEncoder(&buffer)
