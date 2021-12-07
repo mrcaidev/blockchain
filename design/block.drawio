@@ -1,0 +1,82 @@
+<mxfile host="65bd71144e">
+    <diagram id="K6SfFIpNB0NZpOo_Zz8i" name="Page-1">
+        <mxGraphModel dx="990" dy="614" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;时间戳&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+                    <mxGeometry x="120" y="120" width="80" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;NULL&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+                    <mxGeometry x="120" y="80" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;随机数&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+                    <mxGeometry x="200" y="120" width="80" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="&lt;font&gt;&lt;span style=&quot;font-size: 18px&quot;&gt;&lt;b&gt;交&lt;br&gt;易&lt;br&gt;列&lt;br&gt;表&lt;/b&gt;&lt;br&gt;&lt;/span&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+                    <mxGeometry x="40" y="200" width="40" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="&lt;font style=&quot;font-size: 16px ; line-height: 150%&quot;&gt;交易1&lt;br style=&quot;font-size: 16px;&quot;&gt;交易2&lt;br style=&quot;font-size: 16px;&quot;&gt;……&lt;br style=&quot;font-size: 16px;&quot;&gt;交易n&lt;br style=&quot;font-size: 16px;&quot;&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+                    <mxGeometry x="120" y="200" width="160" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=16;curved=1;" edge="1" parent="1" source="15" target="18">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;哈希值&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+                    <mxGeometry x="120" y="160" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="&lt;font&gt;&lt;span style=&quot;font-size: 18px&quot;&gt;&lt;b&gt;区&lt;br&gt;块&lt;br&gt;头&lt;/b&gt;&lt;br&gt;&lt;/span&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+                    <mxGeometry x="40" y="80" width="40" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;时间戳&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+                    <mxGeometry x="320" y="120" width="80" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;前一区块哈希值&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+                    <mxGeometry x="320" y="80" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;随机数&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+                    <mxGeometry x="400" y="120" width="80" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;哈希值&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+                    <mxGeometry x="320" y="160" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=16;curved=1;" edge="1" target="27" parent="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="480" y="180" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="26" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;时间戳&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+                    <mxGeometry x="520" y="120" width="80" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;前一区块哈希值&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+                    <mxGeometry x="520" y="80" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="28" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;随机数&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+                    <mxGeometry x="600" y="120" width="80" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="32" value="&lt;font style=&quot;font-size: 16px;&quot;&gt;哈希值&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+                    <mxGeometry x="520" y="160" width="160" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="35" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontSize=16;curved=1;" edge="1" parent="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="680" y="180" as="sourcePoint"/>
+                        <mxPoint x="720" y="100" as="targetPoint"/>
+                        <Array as="points">
+                            <mxPoint x="700" y="180"/>
+                            <mxPoint x="700" y="100"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="36" value="&lt;font style=&quot;font-size: 16px ; line-height: 150%&quot;&gt;交易1&lt;br style=&quot;font-size: 16px;&quot;&gt;交易2&lt;br style=&quot;font-size: 16px;&quot;&gt;……&lt;br style=&quot;font-size: 16px;&quot;&gt;交易n&lt;br style=&quot;font-size: 16px;&quot;&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+                    <mxGeometry x="320" y="200" width="160" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="37" value="&lt;font style=&quot;font-size: 16px ; line-height: 150%&quot;&gt;交易1&lt;br style=&quot;font-size: 16px;&quot;&gt;交易2&lt;br style=&quot;font-size: 16px;&quot;&gt;……&lt;br style=&quot;font-size: 16px;&quot;&gt;交易n&lt;br style=&quot;font-size: 16px;&quot;&gt;&lt;/font&gt;" style="rounded=0;whiteSpace=wrap;html=1;fontSize=16;" vertex="1" parent="1">
+                    <mxGeometry x="520" y="200" width="160" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="38" value="&lt;b&gt;&lt;font style=&quot;font-size: 18px&quot;&gt;……&lt;/font&gt;&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=16;" vertex="1" parent="1">
+                    <mxGeometry x="740" y="190" width="40" height="20" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
