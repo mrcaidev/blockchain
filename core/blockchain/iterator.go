@@ -1,4 +1,4 @@
-package chain
+package blockchain
 
 import (
 	"blockchain/core/block"

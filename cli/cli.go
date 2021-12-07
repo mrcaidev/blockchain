@@ -29,6 +29,8 @@ func Run() {
 	tradeFrom := tradeCmd.String("from", "", "Source wallet address.")
 	tradeTo := tradeCmd.String("to", "", "Destination wallet address.")
 	tradeAmount := tradeCmd.String("amount", "0", "Amount of coins to trade.")
+	// 重新索引区块链。
+	reindexCmd := flag.NewFlagSet("reindex", flag.ExitOnError)
 	// 打印区块链。
 	printCmd := flag.NewFlagSet("print", flag.ExitOnError)
 	// 显示帮助。
@@ -47,6 +49,8 @@ func Run() {
 		err = balanceCmd.Parse(os.Args[2:])
 	case "trade":
 		err = tradeCmd.Parse(os.Args[2:])
+	case "reindex":
+		err = reindexCmd.Parse(os.Args[2:])
 	case "print":
 		err = printCmd.Parse(os.Args[2:])
 	case "help":
@@ -88,6 +92,9 @@ func Run() {
 		} else {
 			startTrade(*tradeFrom, *tradeTo, amount)
 		}
+
+	} else if reindexCmd.Parsed() {
+		reindexChain()
 
 	} else if printCmd.Parsed() {
 		printChain()

@@ -10,7 +10,7 @@ import (
 )
 
 // 难度系数。
-const difficulty = 24
+const difficulty = 8
 const maxNonce = math.MaxInt64
 
 // 工作量证明结构。

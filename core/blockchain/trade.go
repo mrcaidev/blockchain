@@ -1,4 +1,4 @@
-package chain
+package blockchain
 
 import (
 	"blockchain/transaction"
@@ -7,9 +7,6 @@ import (
 	"encoding/hex"
 	"fmt"
 )
-
-// 挖出新块的奖励。
-const subsidy = 10
 
 // 创建一笔 coinbase 交易。
 func NewCoinbaseTX(to string, data string) *transaction.Transaction {
@@ -42,7 +39,7 @@ func (c *Chain) NewUTXOTX(from string, to string, amount int) *transaction.Trans
 	pubkeyHash := utils.GetPubkeyHash(wallet.Pubkey)
 
 	// 从钱包里找出足够多的钱。
-	deposit, UTXOToPay := c.FindUTXOToPay(pubkeyHash, amount)
+	deposit, UTXOToPay := c.FindUtxosToPay(pubkeyHash, amount)
 
 	// 如果发起方的钱不够了，就报错退出。
 	if deposit < amount {
@@ -77,7 +74,7 @@ func (c *Chain) NewUTXOTX(from string, to string, amount int) *transaction.Trans
 	newTX.ID = newTX.Hash()
 
 	// 发起方对该次交易签名。
-	c.SignTX(&newTX, wallet.Privkey)
+	c.SignTx(&newTX, wallet.Privkey)
 
 	return &newTX
 }

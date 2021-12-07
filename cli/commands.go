@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"blockchain/core/chain"
+	"blockchain/core/blockchain"
 	"blockchain/transaction"
 	"blockchain/utils"
 	"blockchain/wallet"
@@ -32,8 +32,9 @@ func newChain(address string) {
 		panic("invalid address")
 	}
 
-	chain := chain.NewChain(address)
-	chain.Close()
+	chain := blockchain.NewChain(address)
+	defer chain.Close()
+	chain.Reindex()
 
 	fmt.Println("New chain created.")
 }
@@ -44,7 +45,7 @@ func queryBalance(address string) {
 		panic("invalid address")
 	}
 
-	chain := chain.LoadChain()
+	chain := blockchain.LoadChain()
 	defer chain.Close()
 
 	balance := chain.GetBalance(address)
@@ -61,18 +62,29 @@ func startTrade(from string, to string, amount int) {
 		panic("invalid address <to>")
 	}
 
-	chain := chain.LoadChain()
+	chain := blockchain.LoadChain()
 	defer chain.Close()
 
 	tx := chain.NewUTXOTX(from, to, amount)
-	chain.AddBlock([]*transaction.Transaction{tx})
+	coinbaseTx := blockchain.NewCoinbaseTX(from, "")
+	chain.AddBlock([]*transaction.Transaction{coinbaseTx, tx})
 
 	fmt.Println("Trade completed.")
 }
 
+// 重新索引区块链。
+func reindexChain() {
+	chain := blockchain.LoadChain()
+	defer chain.Close()
+
+	chain.Reindex()
+	cnt := chain.CountTx()
+	fmt.Printf("Completed. %d transactions in chain now.", cnt)
+}
+
 // 打印区块链。
 func printChain() {
-	chain := chain.LoadChain()
+	chain := blockchain.LoadChain()
 	defer chain.Close()
 
 	chain.Print()
