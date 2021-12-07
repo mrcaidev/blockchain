@@ -1,6 +1,7 @@
 package block
 
 import (
+	"blockchain/core/merkle"
 	"blockchain/utils"
 	"bytes"
 	"crypto/sha256"
@@ -25,16 +26,14 @@ func newPow(b *Block) *pow {
 	return &pow{b, target}
 }
 
-// 计算当前区块内交易 ID 的哈希值。
-func (b *Block) hashTxID() []byte {
-	var IDs [][]byte
-
+// 获取该区块内交易的 Merkle 树根结点值。
+func (b *Block) hashTx() []byte {
+	var txs [][]byte
 	for _, tx := range b.Transactions {
-		IDs = append(IDs, tx.ID)
+		txs = append(txs, tx.Serialize())
 	}
-	generalHash := sha256.Sum256(bytes.Join(IDs, []byte{}))
-
-	return generalHash[:]
+	tree := merkle.NewMerkleTree(txs)
+	return tree.Root.Data
 }
 
 // 计算当前区块的哈希值。
@@ -42,7 +41,7 @@ func (p *pow) hashBlock(nonce int) [32]byte {
 	blockBytes := bytes.Join(
 		[][]byte{
 			utils.Int64ToBytes(p.block.Timestamp),
-			p.block.hashTxID(),
+			p.block.hashTx(),
 			p.block.PrevBlockHash,
 			utils.Int64ToBytes(int64(nonce)),
 			utils.Int64ToBytes(int64(difficulty)),
